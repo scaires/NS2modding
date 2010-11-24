@@ -241,6 +241,8 @@ function GUIMarineHUD:UpdateResourceBar(deltaTime)
 	local harvesters = math.ceil(PlayerUI_GetPlayerTeamExtractors())
 	local techpoints = math.ceil(PlayerUI_GetPlayerTeamTechPoints())
 	
+	print("Plasma: %d \n Carbon: %d \n Extractors: %d \n TechPoints: %d",plasma,carbon,harvesters,techpoints))
+	
     if self.resourceText then
         self.resourceText:SetText(string.format("Plasma: %d \n Carbon: %d \n Extractors: %d \n TechPoints: %d",plasma,carbon,harvesters,techpoints))
     end

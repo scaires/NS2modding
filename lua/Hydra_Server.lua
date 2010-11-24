@@ -34,24 +34,25 @@ function Hydra:AcquireTarget()
         
             local validTarget = self:GetTargetValid(target)
             if(validTarget) then
-        
-            local newTargetCloser = (self.shortestDistanceToTarget == nil or (distanceToTarget < self.shortestDistanceToTarget))
-            local newTargetIsaPlayer = target:isa("Player")
-    
-            // Give players priority over regular entities, but still pick closer players
-            if( (not self.targetIsaPlayer and newTargetIsaPlayer) or
-                (newTargetCloser and not (self.targetIsaPlayer and not newTargetIsaPlayer)) ) then
+			
+				local newTargetCloser = (self.shortestDistanceToTarget == nil or (distanceToTarget < self.shortestDistanceToTarget))
+				local newTargetIsaPlayer = target:isa("Player")
+		
+				// Give players priority over regular entities, but still pick closer players
+				if( (not self.targetIsaPlayer and newTargetIsaPlayer) or
+					(newTargetCloser and not (self.targetIsaPlayer and not newTargetIsaPlayer)) ) then
 
-				// Set new target
-                self.target = target
-                self.shortestDistanceToTarget = distanceToTarget
-                self.targetIsaPlayer = newTargetIsaPlayer
-            end           
-            
-        end
-            
-    end
-        
+					// Set new target
+					self.target = target
+					self.shortestDistanceToTarget = distanceToTarget
+					self.targetIsaPlayer = newTargetIsaPlayer
+				end           
+				
+			end
+				
+		end
+			
+	end
 end
 
 function Hydra:GetDistanceToTarget(target)
