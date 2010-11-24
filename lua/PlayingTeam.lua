@@ -276,8 +276,9 @@ function PlayingTeam:SetCarbon(amount)
         
     end
     
-    self.carbon = amount
-    
+	//TCBM: Added max carbon
+    self.carbon = math.max(math.min(self.carbon + amount, kMaxCarbon), 0)
+	
     function PlayerSetCarbon(player)
         player.teamCarbon = self.carbon
     end
@@ -780,9 +781,6 @@ function PlayingTeam:ProcessGeneralHelp(player)
         return true
     elseif(not player:isa("Commander") and GetGamerules():GetGameStarted() and player:AddTooltipOnce("Press your C key to bring up your sayings menu.")) then
         return true
-    else
-		player:AddTooltipOncePer("CARBOOON!") then
-		return true
 	end
     return false
     
@@ -881,16 +879,19 @@ function PlayingTeam:UpdateHelp()
                 end
                 
             end
-
+			player:ProcessPlayerResourceHelp()
         end
 
         self:ForEachPlayer(ProcessPlayerHelp)
-    
+		
+		
+		
         self.timeOfLastHelpCheck = Shared.GetTime()
         
     end 
     
 end
+
 
 function PlayingTeam:GetMinimapBlipTypeAndTeam(entity)
 

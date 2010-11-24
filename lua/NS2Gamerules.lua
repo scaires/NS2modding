@@ -1056,16 +1056,9 @@ function NS2Gamerules:GetCanPlayerHearPlayer(listenerPlayer, speakerPlayer)
 end
 
 function NS2Gamerules:RespawnPlayer(player)
-
     local team = player:GetTeam()
     team:AddPlayer(player)
     team:RespawnPlayer(player, nil, nil)
-	//kPlasmaRespawnCost may not be initialized for early spawning
-	local spawningcost = 0
-	if spawningcost ~= nil then
-		spawningcost = kPlasmaRespawnCost
-	end
-    player:AddPlasma(-spawningcost)
 end
 
 function NS2Gamerules:ApplyBulletGameplayEffects(player, trace)

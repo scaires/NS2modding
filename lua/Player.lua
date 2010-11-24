@@ -941,48 +941,18 @@ function Player:GetDisplayTeamCarbon()
     
 end
 
-function Player:GetDisplayTeamExtractors()
+function Player:GetDisplayTeamResourcers()
 
-	local displayTeamHarvesters = 0
-	local harvesters = GetEntitiesIsa("Extractor", -1)
-    for index, harvester in pairs(harvesters) do
-		
-        // Only use unoccupied tech points that are neutral or marked for use with our team
-		if harvester:GetIsBuilt() then
-			displayTeamHarvesters = displayTeamHarvesters + 1
-		end
-	end
-    return displayTeamHarvesters
-end
-
-function Player:GetDisplayTeamHarvesters()
-
-	local displayTeamHarvesters = 0
-	local harvesters = GetEntitiesIsa("Harvester", -1)
-    for index, harvester in pairs(harvesters) do
-		
-        // Only use unoccupied tech points that are neutral or marked for use with our team
-		if entity:GetIsBuilt() then
-			displayTeamHarvesters = displayTeamHarvesters + 1
-		end
-	end
-    return displayTeamHarvesters
+	local resourceTowerName = ConditionalValue(self:isa("Marine"), "Extractor", "Harvester")
+	local numResourceTowers = table.count(GetEntitiesIsa(resourceTowerName, self:GetTeamNumber()))
+	return numResourceTowers
 end
 
 function Player:GetDisplayTeamTechPoints()
 
-	local displayTeamTechPoints = 0
-	local techPoints = GetEntitiesIsa("TechPoint", -1)
-    for index, techPoint in pairs(techPoints) do
-    
-        // Only use unoccupied tech points that are neutral or marked for use with our team
-        local techPointTeamNumber = techPoint:GetTeamNumber()
-		if techPointTeamNumber == self:GetTeamNumber() then
-			displayTeamTechPoints = displayTeamTechPoints + 1
-		end
-	end
-    return displayTeamTechPoints
-    
+	local techPointName = ConditionalValue(self:isa("Marine"), "CommandStation", "Hive")
+	local numTechPoints = table.count(GetEntitiesIsa(techPointName, self:GetTeamNumber()))
+	return numTechPoints
 end
 
 // Team resources

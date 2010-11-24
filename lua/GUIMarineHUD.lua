@@ -76,7 +76,7 @@ function GUIMarineHUD:Initialize()
     self:CreateHealthBar()
     
     self:CreateArmorBar()
-	self:CreateResourceBar()
+	//self:CreateResourceBar()
 end
 
 function GUIMarineHUD:CreateHealthBar()
@@ -179,7 +179,7 @@ function GUIMarineHUD:Update(deltaTime)
     
     self:UpdateHealthBar(deltaTime)
     self:UpdateArmorBar(deltaTime)
-    self:UpdateResourceBar(deltaTime)
+    //self:UpdateResourceBar(deltaTime)
 end
 
 function GUIMarineHUD:UpdateHealthBar(deltaTime)
@@ -238,7 +238,7 @@ function GUIMarineHUD:UpdateResourceBar(deltaTime)
 	
 	local plasma = math.ceil(PlayerUI_GetPlayerResources())
 	local carbon = math.ceil(PlayerUI_GetPlayerTeamCarbon())
-	local harvesters = math.ceil(PlayerUI_GetPlayerTeamExtractors())
+	local harvesters = math.ceil(PlayerUI_GetPlayerTeamResourcers())
 	local techpoints = math.ceil(PlayerUI_GetPlayerTeamTechPoints())
 	
 	print("Plasma: %d \n Carbon: %d \n Extractors: %d \n TechPoints: %d",plasma,carbon,harvesters,techpoints))

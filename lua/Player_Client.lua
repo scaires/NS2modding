@@ -482,20 +482,11 @@ function PlayerUI_GetPlayerTeamCarbon()
 end
 
 //TCBM
-function PlayerUI_GetPlayerTeamHarvesters()
+function PlayerUI_GetPlayerTeamResourcers()
     
     local player = Client.GetLocalPlayer()
     if player then
-        return player:GetDisplayTeamHarvesters()
-    end
-    return 0
-end
-
-function PlayerUI_GetPlayerTeamExtractors()
-    
-    local player = Client.GetLocalPlayer()
-    if player then
-        return player:GetDisplayTeamExtractors()
+        return player:GetDisplayTeamResourcers()
     end
     return 0
 end

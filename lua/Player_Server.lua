@@ -219,7 +219,7 @@ function Player:OnKill(damage, killer, doer, point, direction)
 
     self:AddDeaths()
 	//TCBM: Subtract plasma on death
-    self:SetPlasma(math.max(self.plasma-kPlayerInitialPlasma,0))
+    self:AddPlasma(-kPlasmaRespawnCost)
     // Don't allow us to do anything
     self.alive = false
 
@@ -257,8 +257,8 @@ function Player:SetControllingPlayer(client)
 end
 
 function Player:SetPlasma(amount)
-
-    self.plasma = math.max(math.min(amount, kMaxResources), 0)
+	//TCBM: Max plasma is used instead of maxresources (which is for animations)
+    self.plasma = math.max(math.min(amount, kMaxPlasma), 0)
     
 end
 
@@ -790,6 +790,21 @@ function Player:AddTooltip(tooltipText)
     self:AddDisplayedTooltip(tooltipText)
     self.timeOfLastTooltip = Shared.GetTime()
     
+end
+
+//TCBM: Show player resources in tooltip sent to client
+function Player:ProcessPlayerResourceHelp()
+	if self:isa("Marine") or self:isa("Alien") then 
+		local plasma = math.ceil(self:GetDisplayPlasma())
+		local carbon = math.ceil(self:GetDisplayTeamCarbon())
+		local harvesters = math.ceil(self:GetDisplayTeamResourcers())
+		local techpoints = math.ceil(self:GetDisplayTeamTechPoints())
+		
+		local formatStringMarine = "Plas: %d | Carb: %d \n Res: %d | Cmd: %d"
+		local formatStringAlien = "Plas: %d | Carb: %d \n Res: %d | Hive: %d"
+		local tooltiptext = ConditionalValue(self:isa("Marine"), formatStringMarine, formatStringAlien)
+		self:AddTooltip(string.format(tooltiptext,plasma,carbon,harvesters,techpoints))
+	end
 end
 
 function Player:GetTechTree()

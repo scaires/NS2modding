@@ -34,7 +34,7 @@ function Hydra:AcquireTarget()
         
             local validTarget = self:GetTargetValid(target)
             if(validTarget) then
-			
+        
 				local newTargetCloser = (self.shortestDistanceToTarget == nil or (distanceToTarget < self.shortestDistanceToTarget))
 				local newTargetIsaPlayer = target:isa("Player")
 		
@@ -47,12 +47,11 @@ function Hydra:AcquireTarget()
 					self.shortestDistanceToTarget = distanceToTarget
 					self.targetIsaPlayer = newTargetIsaPlayer
 				end           
-				
-			end
-				
-		end
-			
-	end
+            end
+        end
+            
+    end
+        
 end
 
 function Hydra:GetDistanceToTarget(target)
@@ -98,20 +97,15 @@ function Hydra:AttackTarget()
     end
 end
 
+//TCBM: Hydra Spike Trace
 function Hydra:CreateSpikeTrace()
 	if(self.lastTargetPos ~= nil) then
-		Print("dir")
 		local direction = GetNormalizedVector(Vector(self.lastTargetPos) - self:GetModelOrigin())
-		Print("sp")
 		local startPos = self:GetModelOrigin() + direction
-		Print("local x")
 		local x = (NetworkRandom(string.format("%s:FireBullet %d, %d", self:GetClassName(), 1, 1)) - .5) + (NetworkRandom(string.format("%s:FireBullet %d, %d", self:GetClassName(), 1, 2)) - .5)
 		local y = (NetworkRandom(string.format("%s:FireBullet %d, %d", self:GetClassName(), 1, 3)) - .5) + (NetworkRandom(string.format("%s:FireBullet %d, %d", self:GetClassName(), 1, 4)) - .5)
-		Print("spread dir")
 		local spreadDirection = direction// + x * Hydra.kSpread.x + y * Hydra.kSpread.y
-		Print("end point")
 		local endPoint = startPos + spreadDirection * Hydra.kRange
-		Print("trace")
 		local trace = Shared.TraceRay(startPos, endPoint, PhysicsMask.AllButPCs, EntityFilterOne(self))
 		
 		if (trace.fraction < 1) then
@@ -188,7 +182,7 @@ function Hydra:OnThink()
 
 	if(self:GetIsBuilt()) then    
     
-		//Slowly decrease hydra health
+		//TCBM: Slowly decrease hydra health
 		//Don't use take damage as this spams updates/messagesd
 		if( Shared.GetTime() > (self.timeSpawned + Hydra.kHydraLifetimeCycle) ) then
 			self.health = math.max(0,self.health - (kHydraHealth/(Hydra.kHydraLifetime/Hydra.kHydraLifetimeCycle)))
@@ -200,7 +194,7 @@ function Hydra:OnThink()
 	
         self:AcquireTarget()
 		
-		//attack last position of our target to simulate projectile travel
+		//TCBM: attack last position of our target to simulate projectile travel
         if(self:GetTargetValid(self.target)) then
 			   
             if(self.timeOfNextFire == nil or (Shared.GetTime() > self.timeOfNextFire)) then
@@ -238,6 +232,7 @@ function Hydra:OnConstructionComplete()
     
     // Start scanning for targets once built
     self:SetNextThink(Hydra.kThinkInterval)
+	//TCBM: Hydra spawn time
     self.timeSpawned = Shared.GetTime()    
 	self.lastTargetPos = nil
 end

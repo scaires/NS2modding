@@ -251,17 +251,17 @@ kHealsprayDamageType = kDamageType.Light
 kHealsprayFireDelay = 0.8    
 kHealsprayEnergyCost = 20    
     
-kSpikeMaxDamage = 20    
-kSpikeMinDamage = 10    
-kSpikeDamageType = kDamageType.Normal    
+kSpikeMaxDamage = 15    
+kSpikeMinDamage = 7    
+kSpikeDamageType = kDamageType.Puncture    
 kSpikeFireDelay = 0.1    
 kSpikeEnergyCost = 1.5    
 kPiercingDamageScalar = 1.4    
     
-kSpikesAltDamage = 90    
-kSpikesAltDamageType = kDamageType.Normal    
-kSpikesAltFireDelay = 1    
-kSpikesAltEnergyCost = 30    
+kSpikesAltDamage = 70    
+kSpikesAltDamageType = kDamageType.Puncture    
+kSpikesAltFireDelay = 1.5    
+kSpikesAltEnergyCost = 50    
     
 kSporesDamagePerSecond = 14    
 kSporesDamageType = kDamageType.Normal    
@@ -269,17 +269,17 @@ kSporesFireDelay = 0.8
 kSporesEnergyCost = 20    
     
 kSwipeDamage = 80    
-kSwipeDamageType = kDamageType.Normal    
+kSwipeDamageType = kDamageType.Heavy    
 kSwipeFireDelay = 0.5    
 kSwipeEnergyCost = 6    
     
 kStabDamage = 150    
-kStabDamageType = kDamageType.Puncture    
+kStabDamageType = kDamageType.Heavy    
 kStabFireDelay = 1.5
 kStabEnergyCost = 20
     
 kGoreDamage = 90    
-kGoreDamageType = kDamageType.Normal    
+kGoreDamageType = kDamageType.Structural    
 kGoreFireDelay = 0.7    
 kGoreEnergyCost = 2    
     
@@ -289,7 +289,7 @@ kChargeMinDamage = 1
     
     
 kHydraSpikeDamage = 20    
-kHydraSpikeDamageType = kDamageType.Normal    
+kHydraSpikeDamageType = kDamageType.Light    
     
     
     
