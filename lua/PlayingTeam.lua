@@ -780,8 +780,10 @@ function PlayingTeam:ProcessGeneralHelp(player)
         return true
     elseif(not player:isa("Commander") and GetGamerules():GetGameStarted() and player:AddTooltipOnce("Press your C key to bring up your sayings menu.")) then
         return true
-    end
-        
+    else
+		player:AddTooltipOncePer("CARBOOON!") then
+		return true
+	end
     return false
     
 end
