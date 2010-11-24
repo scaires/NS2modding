@@ -18,13 +18,7 @@ MAC.kModelName = PrecacheAsset("models/marine/mac/mac.model")
 MAC.kAttackSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/attack")
 MAC.kBuildSound = PrecacheAsset("sound/ns2.fev/marine/structures/mac/build")
 MAC.kConfirmSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/confirm")
-<<<<<<< HEAD
 MAC.kStartConstructionSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/constructing")
-=======
-MAC.kConfirm2DSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/confirm_2d")
-MAC.kStartConstructionSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/constructing")
-MAC.kStartConstruction2DSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/constructing_2d")
->>>>>>> c20afe12d26c322f46da7c4833fdeeba7b67a42d
 MAC.kHelpingSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/help_build")
 MAC.kPassbyMACSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/passby_mac")
 MAC.kPassbyDrifterSoundName = PrecacheAsset("sound/ns2.fev/marine/structures/mac/passby_driffter")

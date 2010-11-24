@@ -80,22 +80,6 @@ function Hive:GetNumDesiredEggs()
 end
 
 // Make sure there's enough room here for an egg
-<<<<<<< HEAD
-function Hive:GetHasRoomForEgg(position)
-    
-    local extents = LookupTechData(kTechId.Egg, kTechDataMaxExtents)
-    
-    local startPoint = Vector(position.x, position.y + extents.y, position.z)
-    local endPoint = Vector(startPoint.x, startPoint.y + .1, startPoint.z)
-    
-    local trace = Shared.TraceBox(extents, startPoint, endPoint)
-    
-    return trace.fraction == 1
-
-end
-
-=======
->>>>>>> c20afe12d26c322f46da7c4833fdeeba7b67a42d
 function Hive:SpawnEgg()
 
     local egg = nil

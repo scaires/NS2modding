@@ -1112,6 +1112,23 @@ function GetDevScalar(value, scalar)
     return ConditionalValue(Shared.GetDevMode(), value * scalar, value)
 end
 
+// Capsule start and end define the "core" of the capsule. The ends of the capsule are 
+// rounded and are a half-sphere with radius capsuleRadius.
+// Default is human/bipedal movement, so return upright capsule
+function GetTraceCapsuleFromExtents(extents)
+
+    local radius = math.max(extents.x, 0)
+    
+    if radius == 0 then
+        Print("%GetTraceCapsuleFromExtents(): radius is 0.")
+    end
+    
+    local height = math.max((extents.y - radius) * 2, 0)
+    
+    return height, radius
+    
+end
+
 function PrecacheAsset(effectName)
 
     if(type(effectName) ~= "string") then

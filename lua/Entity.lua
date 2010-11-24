@@ -273,12 +273,12 @@ function GetEntitiesIsaInRadius(className, teamNumber, origin, radius, checkXZOn
         
 end
 
-// Fades damage linearly from center point to radius (0 at far end of radius)
+//TCBM: Radiusdamage is nonlinear and checks for occlusion
+// Fades damage non-linearly (squared) from center point to radius (0 at far end of radius)
 function RadiusDamage(entities, centerOrigin, radius, fullDamage, attacker)
 
     // Do damage to every target in range
     for index, target in ipairs(entities) do
-<<<<<<< HEAD
 		local trace = TraceToExtents(centerOrigin,target,attacker)
 		
 		if trace ~= nil then
@@ -294,21 +294,6 @@ function RadiusDamage(entities, centerOrigin, radius, fullDamage, attacker)
 			target:TakeDamage(damage, attacker, attacker, trace.endPoint, damageDirection)
 		end
 		
-=======
-    
-        local damageDirection = target:GetOrigin() - centerOrigin
-        damageDirection:Normalize()
-        
-        // Damage falloff
-        local distanceFromTarget = (centerOrigin - target:GetOrigin()):GetLength()
-        local damageScalar = 1 - math.min(math.max(0, distanceFromTarget/radius), 1)
-        local damage = fullDamage*damageScalar
-        
-        //Print("RadiusDamage - %s:TakeDamage: %s, %s (dist: %.2f, damageScalar: %.2f, damage: %.2f)", target:GetMapName(), attacker:GetMapName(), tostring(damage), distanceFromTarget, damageScalar, damage)
-        
-        target:TakeDamage(damage, attacker, attacker, target:GetOrigin(), damageDirection)
-        
->>>>>>> c20afe12d26c322f46da7c4833fdeeba7b67a42d
     end
     
 end
