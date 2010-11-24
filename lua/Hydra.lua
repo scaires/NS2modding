@@ -31,7 +31,7 @@ Hydra.kAnimAlert = "alert"
 Hydra.kRange = 17.78        // From NS1 (also "alert" range)
 Hydra.kDamage = 20          // From NS1
 Hydra.kAlertCheckInterval = 2
-Hydra.kHydraLifetime = 240 //total lifetime of hydra
+Hydra.kHydraLifetime = 180 //total lifetime of hydra
 Hydra.kHydraLifetimeCycle= 30 //seconds between automatic damage
 Hydra.kSpread = Vector( 0.02618*4, 0.02618*4, 0.02618*4 )
 
