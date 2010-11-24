@@ -6,7 +6,7 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-//TCBM
+//TCBM set sentry angles to that of builder
 function Sentry:setSentryAngles(builder)
 	local angles = Angles(self:GetAngles())
 	angles.yaw = Angles(builder:GetAngles()).yaw

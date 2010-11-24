@@ -264,13 +264,13 @@ function ReplicateStructure(techId, position, commander)
             Shared.CreateEffect(nil, replicateEffect, srcStructure, nil)
             Shared.CreateEffect(nil, replicateEffect, newEnt, nil)
             
-			//TCBM: Don't complete replicate construction
+			//TCBM: Don't complete replicate construction (Currently disabled, so replicating is still possible)
             // Set construction complete
-            //newEnt:SetConstructionComplete()
+            newEnt:SetConstructionComplete()
             
             // Deploy it and set next think time to that duration
-            //local animLength = newEnt:GetAnimationLength(newEnt:GetDeployAnimation())
-            //newEnt:SetNextThink(animLength)
+            local animLength = newEnt:GetAnimationLength(newEnt:GetDeployAnimation())
+            newEnt:SetNextThink(animLength)
             
             // Play replicate sound at target
             newEnt:PlaySound(CommandStation.kReplicateSound)

@@ -119,6 +119,7 @@ function Flamethrower:GetViewModelName()
     return Flamethrower.kViewModelName
 end
 
+//TCBM: Flamer checks for walls
 function Flamethrower:FirePrimary(player, bullets, range, penetration)
 
     if Server then

@@ -29,7 +29,7 @@ kAdvancedArmoryUpgradeCost = 10
 kWeaponsModuleAddonCost = 20    
 kPrototypeModuleAddonCost = 40    
     
-kSentryCost = 10   
+kSentryCost = 5   
 kSentryTechCost = 10    
     
 kMACMineCost = 5    
@@ -431,15 +431,15 @@ kCommandCenterNanoGridCost = 50
     
 kMACCost = 50      
     
-kReplicateCommandStationCost = 125*0.4      
-kReplicateArmoryCost = 50   *0.4    
-kReplicateInfantryPortalCost = 75*0.4       
-kReplicateArmoryCost = 50   *0.4    
-kReplicateSentryCost = 50 *0.4      
-kReplicateObservatoryCost = 50  *0.4     
-kReplicateRoboticsFactoryCost = 75   *0.4    
-kReplicateMACCost = 50      *0.4 
-kReplicateMASCCost = 75    *0.4   
+kReplicateCommandStationCost = 125      
+kReplicateArmoryCost = 50   
+kReplicateInfantryPortalCost = 75     
+kReplicateArmoryCost = 50  
+kReplicateSentryCost = 50     
+kReplicateObservatoryCost = 50     
+kReplicateRoboticsFactoryCost = 75    
+kReplicateMACCost = 50 
+kReplicateMASCCost = 75   
     
 kHiveInitialEnergy = 100  kHiveMaxEnergy = 200    
 kHiveMassMaxEnergy = 250    

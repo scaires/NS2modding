@@ -224,6 +224,7 @@ function LiveScriptActor:OnKill(damage, attacker, doer, point, direction)
         attacker:AddScore(self:GetPointValue())
 		//give plasma for kills
 		attacker:AddPlasma(self:GetPointValue()/5)
+		attacker:ProcessPlayerResourceHelp()
     end
 
     local killedSound = self:GetKilledSound(doer)

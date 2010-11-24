@@ -330,7 +330,7 @@ function Team:UpdateHelp()
     
         function ProcessPlayerHelp(player)
 
-            if(player:AddTooltipOnce("Welcome to the Natural Selection 2 beta!")) then
+            if(player:AddTooltipOnce("Welcome to the Natural Selection 2 beta!\n This server is running the UNOFFICIAL [IAM] BalancedMod v 1.0 for build 156")) then
                 return true
             elseif(player:AddTooltipOncePer("You're in the ready room. In the console, type j1 or j2 to play (rr for ready room).", 30)) then
                 return true

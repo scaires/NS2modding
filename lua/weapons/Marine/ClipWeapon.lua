@@ -62,6 +62,7 @@ function ClipWeapon:GetBulletsPerShot()
 end
 
 function ClipWeapon:GetNumStartClips()
+	//TCBM: Use starting clip value from balance
 	return kClipWeaponStartClips
 end
 

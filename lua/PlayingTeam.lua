@@ -879,7 +879,7 @@ function PlayingTeam:UpdateHelp()
                 end
                 
             end
-			player:ProcessPlayerResourceHelp()
+			//player:ProcessPlayerResourceHelp()
         end
 
         self:ForEachPlayer(ProcessPlayerHelp)
