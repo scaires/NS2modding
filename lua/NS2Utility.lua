@@ -264,7 +264,7 @@ function ReplicateStructure(techId, position, commander)
             Shared.CreateEffect(nil, replicateEffect, srcStructure, nil)
             Shared.CreateEffect(nil, replicateEffect, newEnt, nil)
             
-			//Don't complete replicate construction
+			//TCBM: Don't complete replicate construction
             // Set construction complete
             //newEnt:SetConstructionComplete()
             
@@ -458,6 +458,7 @@ function GetIsBuildPickVecLegal(techId, player, pickVec, snapRadius)
     
 end
 
+//TCBM: traces to extents of a unit box
 function TraceToExtents(origin, target,actor)
 	local tgtCenter = target:GetOrigin()
 	local extents = target:GetExtents()
@@ -914,23 +915,25 @@ function SetPlayerPoseParameters(player, viewAngles, velocity, maxSpeed, maxBack
     
 end
 
-function GetHasRoomForExtents(extents, position)
-    
+// Pass in position on ground
+function GetHasRoomForCapsule(extents, position, physicsMask, ignoreEntity)
+
     if extents ~= nil then
     
-        local startPoint = Vector(position.x, position.y + extents.y, position.z)
+        local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)
+        local startPoint = Vector(position.x, position.y + capsuleHeight/2 + capsuleRadius, position.z)
         local endPoint = Vector(startPoint.x, startPoint.y + .1, startPoint.z)
         
-        local trace = Shared.TraceBox(extents, startPoint, endPoint)
+        local trace = Shared.TraceCapsule(startPoint, endPoint, capsuleRadius, capsuleHeight, physicsMask, EntityFilterOne(ignoreEntity))
         
-        return trace.fraction == 1
+        return (trace.fraction == 1)        
         
     else
-        Print("GetHasRoomForExtents(): Extents not valid.")
+        Print("GetHasRoomForCapsule(): Extents not valid.")
     end
     
     return false
-    
+
 end
 
 function GetOnFireCinematic(ent)
@@ -943,7 +946,8 @@ function GetOnFireCinematic(ent)
         return Flamethrower.kBurnSmallCinematic
     elseif className == "Onos" then
         return Flamethrower.kBurnBigCinematic
-    elseif ent:isa("Alien") then
+	//TCBM: Aliens have "small" burn cinematic to obscure vision less    
+	elseif ent:isa("Alien") then
 		return Flamethrower.kBurnSmallCinematic
 	end
     return Flamethrower.kBurnMedCinematic

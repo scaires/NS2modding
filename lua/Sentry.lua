@@ -41,6 +41,7 @@ PrecacheMultipleAssets(Sentry.kRicochetEffect, kSurfaceList)
 
 // Balance
 Sentry.kPingInterval = 4
+//TCBM: faster check time, think interval, and FOV
 Sentry.kScanThinkInterval = .25
 Sentry.kFov = 120
 Sentry.kBaseROF = kSentryAttackBaseROF
@@ -74,6 +75,7 @@ local networkVars = {
     targetDirection             = "vector"
 }
 
+//TCBM: return correct sentry attack type
 function Sentry:GetDamageType()
 	return kSentryAttackDamageType
 end

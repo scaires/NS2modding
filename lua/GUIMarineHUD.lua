@@ -12,7 +12,8 @@
 class 'GUIMarineHUD' (GUIScript)
 
 GUIMarineHUD.kTextureName = "ui/marine_health_bg.dds"
-GUIMarineHUD.kTextFontName = "MicrogrammaDMedExt"
+GUIMarineHUD.kTextFontName = "MicrogrammaDBolExt"
+GUIMarineHUD.kTextFontName2 = "MicrogrammaDMedExt"
 
 GUIMarineHUD.kBackgroundWidth = 232
 GUIMarineHUD.kBackgroundHeight = 50
@@ -152,7 +153,7 @@ function GUIMarineHUD:CreateResourceBar()
 
     self.resourceText = GUI.CreateTextItem()
     self.resourceText:SetFontSize(GUIMarineHUD.kResourceTextFontSize)
-    self.resourceText:SetFontName(GUIMarineHUD.kTextFontName)
+    self.resourceText:SetFontName(GUIMarineHUD.kTextFontName2)
     self.resourceText:SetFontIsBold(false)
     self.resourceText:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.resourceText:SetTextAlignmentX(GUITextItem.Align_Center)

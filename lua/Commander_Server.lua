@@ -132,10 +132,11 @@ function Commander:AttemptToBuild(techId, origin, pickVec, buildTech, builderEnt
         local newEnt = CreateEntityForCommander(techId, position, self)
 		
         if newEnt ~= nil then
+			//TCBM: Sentry direction set to that of builder
             if techId == kTechId.Sentry then
 				newEnt:setSentryAngles(builderEntity)
 			end
-			
+
             newEnt:PlaySound(self:GetPlaceBuildingSound())
             
             // Play private version for commander too 

@@ -80,6 +80,7 @@ function Hive:GetNumDesiredEggs()
 end
 
 // Make sure there's enough room here for an egg
+<<<<<<< HEAD
 function Hive:GetHasRoomForEgg(position)
     
     local extents = LookupTechData(kTechId.Egg, kTechDataMaxExtents)
@@ -93,6 +94,8 @@ function Hive:GetHasRoomForEgg(position)
 
 end
 
+=======
+>>>>>>> c20afe12d26c322f46da7c4833fdeeba7b67a42d
 function Hive:SpawnEgg()
 
     local egg = nil

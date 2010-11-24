@@ -293,7 +293,8 @@ function PlayingTeam:GetCarbon()
 end
 
 function PlayingTeam:AddCarbon(amount)
-
+	
+	//TCBM: max carbon
     self:SetCarbon(math.min(self.carbon + amount,kMaxCarbon))
     
 end
@@ -1029,6 +1030,7 @@ function PlayingTeam:UpdateGameEffects(timePassed)
 
 end
 
+//TCBM: burning changed to incorporate armor for chance to put self out 
 function PlayingTeam:UpdateTeamSpecificGameEffects(teamEntities, enemyPlayers)
 
     local catchFireEntities = {}

@@ -218,6 +218,7 @@ function Player:OnKill(damage, killer, doer, point, direction)
     self:SetIsThirdPerson(4)
 
     self:AddDeaths()
+	//TCBM: Subtract plasma on death
     self:SetPlasma(math.max(self.plasma-kPlayerInitialPlasma,0))
     // Don't allow us to do anything
     self.alive = false

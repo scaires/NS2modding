@@ -780,7 +780,14 @@ function Marine:ExecuteSaying(index)
 
         self:PlaySound(sayings[index])
         
+<<<<<<< HEAD
         self:GetTeam():TriggerAlert(sayingActions[index], self)
+=======
+        local techId = sayingActions[index]
+        if techId ~= kTechId.None then
+            self:GetTeam():TriggerAlert(techId, self)
+        end
+>>>>>>> c20afe12d26c322f46da7c4833fdeeba7b67a42d
         
     end
     

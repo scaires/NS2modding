@@ -205,7 +205,7 @@ function NS2Gamerules:OnEntityChange(oldId, newId)
     
 end
 
-// Called whenever an entity is f. Killer could be the same as targetEntity. Called before entity is destroyed.
+// Called whenever an entity is killed. Killer could be the same as targetEntity. Called before entity is destroyed.
 function NS2Gamerules:OnKill(targetEntity, damage, attacker, doer, point, direction)
 
     self.team1:OnKill(targetEntity, damage, attacker, doer, point, direction)
@@ -882,7 +882,7 @@ function NS2Gamerules:CheckGameStart()
         local team1Players = self.team1:GetNumPlayers()
         local team2Players = self.team2:GetNumPlayers()
         
-        if  (team1Players >= 0 or team2Players >= 0) or (Shared.GetCheatsEnabled() and (team1Players > 0 or team2Players > 0)) then
+        if  (team1Players > 0 and team2Players > 0) or (Shared.GetCheatsEnabled() and (team1Players > 0 or team2Players > 0)) then
             
             self:StartGameCountdown()
             
@@ -904,11 +904,11 @@ function NS2Gamerules:CheckGameEnd()
             local team2Won = self.team2:GetHasTeamWon()
             
             if((team1Lost and team2Lost) or (team1Won and team2Won)) then
-                //self:DrawGame()
+                self:DrawGame()
             elseif(team1Lost or team2Won) then
-                //self:EndGame(self.team2)
+                self:EndGame(self.team2)
             elseif(team2Lost or team1Won) then
-                //self:EndGame(self.team1)
+                self:EndGame(self.team1)
             end
             
             self.timeLastGameEndCheck = Shared.GetTime()

@@ -9,20 +9,26 @@
 
 function Alien:Evolve(techId)
 
+    local handled = false
     local success = false
-    local newPlayer = nil
     
     // Morph into new class or buy upgrade
     local gestationClassName = LookupTechData(techId, kTechDataGestateName)
     
-    if(gestationClassName ~= nil) then
-    
-        // Change into new life form if different
-        if self:GetClassName() ~= gestationClassName then
+    // Change into new life form if different
+    if(gestationClassName ~= nil) and (self:GetClassName() ~= gestationClassName) then
+
+        // Check for room
+        local eggExtents = LookupTechData(kTechId.Embryo, kTechDataMaxExtents)
+        local newAlienExtents = LookupTechData(techId, kTechDataMaxExtents)
+        local physicsMask = PhysicsMask.AllButPCsAndRagdolls
+        local position = self:GetOrigin()
+        
+        if GetHasRoomForCapsule(eggExtents, position, physicsMask, self) and GetHasRoomForCapsule(newAlienExtents, position, physicsMask, self) then
         
             self:RemoveChildren()
             
-            newPlayer = self:Replace(Embryo.kMapName)
+            local newPlayer = self:Replace(Embryo.kMapName)
             
             // Clear angles, in case we were wall-walking or doing some crazy alien thing
             local angles = Angles(self:GetViewAngles())
@@ -39,22 +45,29 @@ function Alien:Evolve(techId)
             newPlayer:SetGestationTechId(techId)
             
             success = true
+
+        else
+        
+            // Pop up tooltip
+            self:AddTooltipOncePer("You need more room to evolve.", 3)
             
         end        
         
+        handled = true
+
     end
     
-    return success, newPlayer
+    return handled, success
     
 end
 
 // Availability and cost already checked
 function Alien:AttemptToBuy(techId)
 
-    local success = false
-    
     // Morph into new class 
-    if not self:Evolve(techId) then
+    local handled, success = self:Evolve(techId)
+    
+    if not handled then
         
         // Else try to buy tech (carapace, piercing, etc.). If we don't already have this tech node, buy it.
         if not self:GetHasUpgrade(techId) then
@@ -62,7 +75,7 @@ function Alien:AttemptToBuy(techId)
             success = self:GiveUpgrade(techId)
             
         else
-            Print("%s:AttemptToBuy(%d) - Player already has tech (%s).", techId, LookupTechData(techId, kTechDataDisplayName, "unknown"))
+            Print("%s:AttemptToBuy(%s) - Player already has tech.", self:GetClassName(), EnumToString(kTechId, techId))
         end
     
     end

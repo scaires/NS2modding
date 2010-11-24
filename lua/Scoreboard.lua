@@ -17,6 +17,12 @@ kScoreboardDataIndexDeaths = 6
 kScoreboardDataIndexIsCommander = 7
 kScoreboardDataIndexPing = 8
 
+function Scoreboard_Clear()
+
+    playerData = { }
+    
+end
+
 // Hooks from console commands coming from server
 function Scoreboard_OnResetGame()
 

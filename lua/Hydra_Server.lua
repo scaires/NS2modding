@@ -29,9 +29,11 @@ function Hydra:AcquireTarget()
     
     for index, target in pairs(targets) do
     
-        local validTarget, distanceToTarget = self:GetTargetValid(target)
+        local distanceToTarget = self:GetDistanceToTarget(target)
+        if distanceToTarget < Hydra.kRange then
         
-        if(validTarget) then
+            local validTarget = self:GetTargetValid(target)
+            if(validTarget) then
         
             local newTargetCloser = (self.shortestDistanceToTarget == nil or (distanceToTarget < self.shortestDistanceToTarget))
             local newTargetIsaPlayer = target:isa("Player")
@@ -52,13 +54,16 @@ function Hydra:AcquireTarget()
         
 end
 
+function Hydra:GetDistanceToTarget(target)
+    return (target:GetEngagementPoint() - self:GetModelOrigin()):GetLength()           
+end
+
 function Hydra:GetTargetValid(target, logError)
 
     if(target ~= nil and (target:isa("Player") or target:isa("Structure")) and target.alive and target ~= self and target:GetCanTakeDamage()) then
     
-        local distance = (target:GetEngagementPoint() - self:GetModelOrigin()):GetLength()
-        
-        if(distance < Hydra.kRange) then
+        local distance = self:GetDistanceToTarget(target)
+        if distance < Hydra.kRange then
         
             // Perform trace to make sure nothing is blocking our target. Trace from enemy to us
             local trace = Shared.TraceRay(target:GetModelOrigin(), self:GetModelOrigin(), PhysicsMask.AllButPCs, EntityFilterTwo(target, self))               
@@ -68,13 +73,13 @@ function Hydra:GetTargetValid(target, logError)
                 Print("Hydra:GetTargetValid(): Target %s not valid, blocked by %s", SafeClassName(target), SafeClassName(trace.entity))
             end
             
-            return validTarget, distance
+            return validTarget
             
         end
     
     end
     
-    return false, -1
+    return false
 
 end
 
@@ -159,9 +164,9 @@ function Hydra:GetIsEnemyNearby()
     
     for index, player in ipairs(enemyPlayers) do                
     
-        if not player:isa("Commander") then
+        if player:GetIsVisible() and not player:isa("Commander") then
         
-            local dist = (player:GetEngagementPoint() - self:GetModelOrigin()):GetLength()
+            local dist = self:GetDistanceToTarget(player)
             if dist < Hydra.kRange then
         
                 return true

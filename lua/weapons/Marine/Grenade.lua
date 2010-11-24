@@ -17,7 +17,7 @@ Grenade.kExplosionEffect    = "cinematics/materials/%s/grenade_explosion.cinemat
 PrecacheMultipleAssets(Grenade.kExplosionEffect, kSurfaceList)
 
 Grenade.kDamageRadius       = 10
-//Use balance.lua value
+//TCBM Use balance.lua value
 Grenade.kMaxDamage          = kGrenadeLauncherDamage
 Grenade.kThinkInterval = .3
 Grenade.kLifetime = 5
@@ -27,6 +27,7 @@ function Grenade:OnCreate()
 
     Projectile.OnCreate(self)
     self:SetModel( Grenade.kModelName )
+	//TCBM: grenade lifetime
     self.timeSpawned = Shared.GetTime()
 	self:SetNextThink(Grenade.kThinkInterval)
 end
@@ -35,11 +36,13 @@ function Grenade:GetDeathIconIndex()
     return kDeathMessageIcon.Grenade
 end
 
+//TCBM: Grenade damage type
 function Grenade:GetDamageType()
 	return kGrenadeLauncherDamageType
 end
 
 if (Server) then
+	//TCBM: Grenade lifetime
 	function Grenade:OnThink()
 
 		if( Shared.GetTime() > (self.timeSpawned + Grenade.kLifetime) ) or self:GetVelocity():GetLength() < Grenade.kMinVelocity then
@@ -56,7 +59,7 @@ if (Server) then
 		end
 		
 	end
-	
+	//TCBM: Grenade explosion separate method
 	function Grenade:GrenadeExplode()
 		// Play sound and particle effect
 		Shared.PlayWorldSound(nil, Grenade.kExplosionSound, nil, self:GetOrigin())

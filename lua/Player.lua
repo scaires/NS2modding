@@ -911,12 +911,12 @@ function Player:GetMass()
     return Player.kMass
 end
 
-//use specific max plasma value
+//TCBM: use specific max plasma value
 function Player:AddPlasma(amount)
     self.plasma = math.max(math.min(self.plasma + amount, kMaxPlasma), 0)
 end
 
-//use specific max carbon value
+//TCBM: use specific max carbon value
 function Player:AddCarbon(amount)
     self.teamCarbon = math.max(math.min(self.teamCarbon + amount, kMaxCarbon), 0)
 end
@@ -1319,22 +1319,8 @@ function Player:GetItem(mapName)
     
 end
 
-// Capsule start and end define the "core" of the capsule. The ends of the capsule are 
-// rounded and are a half-sphere with radius capsuleRadius.
-// Default is human/bipedal movement, so return upright capsule
 function Player:GetTraceCapsule()
-    
-    local extents = self:GetExtents()
-    local radius = math.max(extents.x, 0)
-    
-    if radius == 0 then
-        Print("%s:GetTraceCapsule(): radius is 0.", self:GetClassName())
-    end
-    
-    local height = math.max((extents.y - radius) * 2, 0)
-    
-    return height, radius
-
+    return GetTraceCapsuleFromExtents(self:GetExtents())    
 end
 
 function Player:GetMovePhysicsMask()

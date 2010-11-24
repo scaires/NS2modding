@@ -218,7 +218,10 @@ function Alien:ExecuteSaying(index)
 
         self:PlaySound(alienGroupSayingsSounds[index])
         
-        self:GetTeam():TriggerAlert(alienRequestActions[index], self)
+        local techId = alienRequestActions[index]
+        if techId ~= kTechId.None then
+            self:GetTeam():TriggerAlert(techId, self)
+        end
         
     end
     

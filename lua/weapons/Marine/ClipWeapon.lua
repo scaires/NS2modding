@@ -300,18 +300,20 @@ end
 
 function ClipWeapon:PlayPrimaryAttackSound(player)
 
-    if(self.loopingWeaponSoundPlaying == 0) then
+    local attackLoops = self:GetIsPrimaryAttackLooping()
+    
+    if not attackLoops or (self.loopingWeaponSoundPlaying == 0) then
     
         Shared.PlaySound(player, self:GetFireSoundName())
-        
-        if(self:GetIsPrimaryAttackLooping()) then
+    
+        if attackLoops then
         
             self.loopingWeaponSoundPlaying = 1 
             
         end
         
     end
-    
+        
 end
 
 function ClipWeapon:GetPrimaryAttackRequiresPress()
@@ -323,7 +325,7 @@ function ClipWeapon:GetForcePrimaryAttackAnimation()
 end
 
 function ClipWeapon:OnPrimaryAttack(player)
-
+   
     if(not self:GetPrimaryAttackRequiresPress() or not self.primaryAttackLastFrame) then
     
         if (self.clip > 0 ) then

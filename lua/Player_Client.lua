@@ -471,6 +471,7 @@ function PlayerUI_GetPlayerResources()
     return 0
 end
 
+//TCBM
 function PlayerUI_GetPlayerTeamCarbon()
     
     local player = Client.GetLocalPlayer()
@@ -480,6 +481,7 @@ function PlayerUI_GetPlayerTeamCarbon()
     return 0
 end
 
+//TCBM
 function PlayerUI_GetPlayerTeamHarvesters()
     
     local player = Client.GetLocalPlayer()

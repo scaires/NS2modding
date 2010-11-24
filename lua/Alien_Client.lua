@@ -258,8 +258,12 @@ function Alien:OnInitLocalClient()
         //Client.BindFlashTexture("alien_abilities", Alien.kHUDAbilitiesTexture)
         //Client.BindFlashTexture("alien_upgradeicons", Alien.kUpgradeIconsTexture)
         
-        GetGUIManager():CreateGUIScriptSingle("GUIAlienHUD")
-        GetGUIManager():CreateGUIScriptSingle("GUIHiveBlips")
+        if self.alienHUD == nil then
+            self.alienHUD = GetGUIManager():CreateGUIScriptSingle("GUIAlienHUD")
+        end
+        if self.hiveBlips == nil then
+            self.hiveBlips = GetGUIManager():CreateGUIScriptSingle("GUIHiveBlips")
+        end
                
         Shared.PlaySound(self, self:GetSpawnSound())
 
@@ -268,9 +272,13 @@ function Alien:OnInitLocalClient()
 end
 
 function Alien:OnDestroyClient()
-
-    if Client.GetLocalPlayer() == self then
+    
+    if self.alienHUD then
+        self.alienHUD = nil
         GetGUIManager():DestroyGUIScriptSingle("GUIAlienHUD")
+    end
+    if self.hiveBlips then
+        self.hiveBlips = nil
         GetGUIManager():DestroyGUIScriptSingle("GUIHiveBlips")
     end
 

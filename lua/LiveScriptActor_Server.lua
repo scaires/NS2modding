@@ -347,7 +347,8 @@ function LiveScriptActor:ComputeDamage(damage, damageType)
         // Calculate damage absorbed by armor according to damage type
         local absorbPercentage = self:GetArmorAbsorbPercentage(damageType)
         
-        // Each point of armor blocks a point of health but is only destroyed at half that rate (like NS1)
+		//TCBM: Fixed health points used bug        
+		// Each point of armor blocks a point of health but is only destroyed at half that rate (like NS1)
         healthPointsBlocked = math.min(self.armor, absorbPercentage * damage )
 		armorPointsUsed = healthPointsBlocked / self:GetHealthPerArmor(damageType)
         

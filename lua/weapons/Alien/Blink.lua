@@ -132,7 +132,7 @@ function Blink:PerformBacktrace(player, startPos, endPos, endPosDiffStep, maxTra
         
         VectorCopy(trace.endPoint, blinkPosition)
         
-        validPosition = GetHasRoomForExtents(player:GetExtents(), blinkPosition)
+        validPosition = GetHasRoomForCapsule(player:GetExtents(), blinkPosition, PhysicsMask.AllButPCsAndRagdolls, player)
         
         if validPosition then
             break            
@@ -176,7 +176,7 @@ function Blink:GetBlinkPosition(player)
             
             blinkPosition = blinkPosition + Vector(0, .025, 0)
             
-            validPosition = GetHasRoomForExtents(player:GetExtents(), blinkPosition)
+            validPosition = GetHasRoomForCapsule(player:GetExtents(), blinkPosition, PhysicsMask.AllButPCsAndRagdolls, player)
             
             // Make sure we can see ghost (to be sure it's not outside the level)
             if validPosition then
@@ -208,7 +208,7 @@ function Blink:GetBlinkPosition(player)
         // If we hit a friend or enemy, blink above, behind or to side of them, depending on exact direction
         elseif trace.entity ~= nil and trace.entity:isa("LiveScriptActor") then
         
-            validPosition = GetHasRoomForExtents(player:GetExtents(), blinkPosition)
+            validPosition = GetHasRoomForCapsule(player:GetExtents(), blinkPosition, PhysicsMask.AllButPCsAndRagdolls, player)
             blinkType = kBlinkType.Attack
             
         end
@@ -231,7 +231,7 @@ function Blink:GetBlinkPosition(player)
         
             VectorCopy(endOrigin, blinkPosition)
             blinkPosition.y = blinkPosition.y - Fade.YExtents
-            validPosition = GetHasRoomForExtents(player:GetExtents(), blinkPosition)
+            validPosition = GetHasRoomForCapsule(player:GetExtents(), blinkPosition, PhysicsMask.AllButPCsAndRagdolls, player)
             
             if validPosition then
                 blinkType = kBlinkType.InAir
@@ -256,7 +256,7 @@ end
 
 function Blink:PerformBlink(player)
 
-	local coords, valid = self:GetBlinkPosition(player)
+    local coords, valid = self:GetBlinkPosition(player)
     
     if valid then
 
@@ -328,7 +328,8 @@ function Blink:PerformSecondaryAttack(player)
     // If we've already got a ghost, blink to it
     if self.showingGhost then
     
-        blinked = self:PerformBlink(player)    
+        //TCBM: Blink puts out flames
+		blinked = self:PerformBlink(player)    
 		if blinked and (player.SetGameEffectMask ~= nil) then
 			player:SetGameEffectMask(kGameEffect.OnFire, false)
 		end

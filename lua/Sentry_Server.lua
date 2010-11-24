@@ -7,10 +7,6 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 //TCBM
-function Sentry:isSentry()
-	return true
-end
-
 function Sentry:setSentryAngles(builder)
 	local angles = Angles(self:GetAngles())
 	angles.yaw = Angles(builder:GetAngles()).yaw

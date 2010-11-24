@@ -14,6 +14,7 @@ class 'ResourceTower' (Structure)
 ResourceTower.kMapName = "resourcetower"
 
 ResourceTower.kPlasmaInjection = 1
+//TCBM: halved resource rate
 ResourceTower.kCarbonInjection = 0.5
 ResourceTower.kMaxUpgradeLevel = 3
 
@@ -50,7 +51,8 @@ function ResourceTower:SetUpgradeLevel(upgradeLevel)
 end
 
 function ResourceTower:GiveResourcesToTeam(player)
-
+	
+	//TCBM: divide plasma evenly among team members
     local plasma = (ResourceTower.kPlasmaInjection/(self:GetTeam():GetNumPlayers())) * (1 + self:GetUpgradeLevel() * kResourceUpgradeAmount)
     player:AddPlasma(plasma, true)
 	//Print("player plasma: %f + %f", plasma, player.plasma)
