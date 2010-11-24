@@ -12,7 +12,7 @@
 class 'GUIMarineHUD' (GUIScript)
 
 GUIMarineHUD.kTextureName = "ui/marine_health_bg.dds"
-GUIMarineHUD.kTextFontName = "MicrogrammaDBolExt"
+GUIMarineHUD.kTextFontName = "MicrogrammaDMedExt"
 
 GUIMarineHUD.kBackgroundWidth = 232
 GUIMarineHUD.kBackgroundHeight = 50
@@ -54,8 +54,8 @@ GUIMarineHUD.kArmorBarTextureX2 = 200
 GUIMarineHUD.kArmorBarTextureY2 = 96
 
 //Resource bar constants
-GUIMarineHUD.kResourceTextFontSize = 14
-GUIMarineHUD.kResourceTextOffset = Vector(255, 255, 0)
+GUIMarineHUD.kResourceTextFontSize = 18
+GUIMarineHUD.kResourceTextOffset = Vector(55, 145, 0)
 
 // Number of pixels a second the background bars move.
 GUIMarineHUD.kBackgroundBarRate = 75
@@ -159,8 +159,7 @@ function GUIMarineHUD:CreateResourceBar()
     self.resourceText:SetTextAlignmentY(GUITextItem.Align_Center)
     self.resourceText:SetPosition(GUIMarineHUD.kResourceTextOffset)
     self.resourceText:SetColor(Color(1, 1, 1, 1))
-
-    self.background:AddChild(self.resourceText)
+	self.resourceText:SetText("RESOURCES LOL")
 
 end
 
@@ -235,10 +234,14 @@ function GUIMarineHUD:UpdateArmorBar(deltaTime)
 end
 
 function GUIMarineHUD:UpdateResourceBar(deltaTime)
-
-    if self.resourceBar then
-        // Update text.
-        self.resourceText:SetText(tostring(PlayerUI_GetPlayerArmor()))
+	
+	local plasma = math.ceil(PlayerUI_GetPlayerResources())
+	local carbon = math.ceil(PlayerUI_GetPlayerTeamCarbon())
+	local harvesters = math.ceil(PlayerUI_GetPlayerTeamExtractors())
+	local techpoints = math.ceil(PlayerUI_GetPlayerTeamTechPoints())
+	
+    if self.resourceText then
+        self.resourceText:SetText(string.format("Plasma: %d \n Carbon: %d \n Extractors: %d \n TechPoints: %d",plasma,carbon,harvesters,techpoints))
     end
     
 end

@@ -294,7 +294,7 @@ end
 
 function PlayingTeam:AddCarbon(amount)
 
-    self:SetCarbon(min(self.carbon + amount,kMaxCarbon))
+    self:SetCarbon(math.min(self.carbon + amount,kMaxCarbon))
     
 end
 

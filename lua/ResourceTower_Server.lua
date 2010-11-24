@@ -41,7 +41,7 @@ function ResourceTower:UpdateOnThink()
     if(team ~= nil) then
 		local carbon = ResourceTower.kCarbonInjection * (1 + self:GetUpgradeLevel() * kResourceUpgradeAmount)
         team:AddCarbon(carbon)
-        Print("team carbon: %f + %f", carbon, team.carbon)
+        //Print("team carbon: %f + %f", carbon, team.carbon)
     end
     
     self:PlaySound(self:GetHarvestedSound())

@@ -289,7 +289,7 @@ function RadiusDamage(entities, centerOrigin, radius, fullDamage, attacker)
 			local damageScalar = math.min(math.max(0, ((radius - distanceFromTarget)*(radius-distanceFromTarget))/(radius*radius)), 1)
 			local damage = fullDamage*damageScalar
 			
-			Print("RadiusDamage - %s:TakeDamage: %s, %s (dist: %.2f, damageScalar: %.2f, damage: %.2f) index %d", target:GetMapName(), attacker:GetMapName(), tostring(damage), distanceFromTarget, damageScalar, damage,index)
+			//Print("RadiusDamage - %s:TakeDamage: %s, %s (dist: %.2f, damageScalar: %.2f, damage: %.2f) index %d", target:GetMapName(), attacker:GetMapName(), tostring(damage), distanceFromTarget, damageScalar, damage,index)
 			target:TakeDamage(damage, attacker, attacker, trace.endPoint, damageDirection)
 		end
 		

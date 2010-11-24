@@ -480,6 +480,33 @@ function PlayerUI_GetPlayerTeamCarbon()
     return 0
 end
 
+function PlayerUI_GetPlayerTeamHarvesters()
+    
+    local player = Client.GetLocalPlayer()
+    if player then
+        return player:GetDisplayTeamHarvesters()
+    end
+    return 0
+end
+
+function PlayerUI_GetPlayerTeamExtractors()
+    
+    local player = Client.GetLocalPlayer()
+    if player then
+        return player:GetDisplayTeamExtractors()
+    end
+    return 0
+end
+
+function PlayerUI_GetPlayerTeamTechPoints()
+    
+    local player = Client.GetLocalPlayer()
+    if player then
+        return player:GetDisplayTeamTechPoints()
+    end
+    return 0
+end
+
 function PlayerUI_GetPlayerHealth()
     local player = Client.GetLocalPlayer()
     if player then

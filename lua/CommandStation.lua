@@ -134,8 +134,8 @@ function CommandStation:PerformActivation(techId, position, commander)
         
             // Check if we have enough carbon to replicate this structure
             local structureId = LookupTechData(techId, kTechDataReplicateTechId)
-            //Use replicate cost instead of normal cost
-			local cost = LookupTechData(kTechDataReplicateTechId, kTechDataCostKey)
+            //Use replicate cost (techid) instead of normal cost (structureid)
+			local cost = LookupTechData(techId, kTechDataCostKey)
             local costsCarbon = commander:GetTechTree():GetTechNode(structureId):GetIsBuild()
             
             if (costsCarbon and (commander:GetTeam():GetCarbon() >= cost)) or (commander:GetPlasma() >= cost) then

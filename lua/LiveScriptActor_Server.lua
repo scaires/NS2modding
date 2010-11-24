@@ -222,6 +222,8 @@ function LiveScriptActor:OnKill(damage, attacker, doer, point, direction)
     // Give points to killer
     if(attacker ~= nil and attacker:isa("Player") and attacker:GetTeamNumber() ~= self:GetTeamNumber()) then
         attacker:AddScore(self:GetPointValue())
+		//give plasma for kills
+		attacker:AddPlasma(self:GetPointValue()/5)
     end
 
     local killedSound = self:GetKilledSound(doer)
@@ -351,7 +353,7 @@ function LiveScriptActor:ComputeDamage(damage, damageType)
         
         // Anything left over comes off of health
         healthPointsUsed = damage - healthPointsBlocked
-        Print("health: %d, armor: %d, damage: %d, healthPointsBlocked: %d, apu: %d, hpu: %d",self.health, self.armor, damage, healthPointsBlocked,armorPointsUsed,healthPointsUsed)
+        //Print("health: %d, armor: %d, damage: %d, healthPointsBlocked: %d, apu: %d, hpu: %d",self.health, self.armor, damage, healthPointsBlocked,armorPointsUsed,healthPointsUsed)
     end
     
     return damage, armorPointsUsed, healthPointsUsed
