@@ -6,7 +6,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-kMaxCarbon = 200
+//TCBM: max carbon/plasma
+kMaxCarbon = 500
 kMaxPlasma = 100
 // Time spawning alien player must be in egg before hatching
 kAlienSpawnTime = 2

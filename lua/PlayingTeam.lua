@@ -16,6 +16,8 @@ PlayingTeam.kObliterateVictoryCarbonNeeded = 500
 PlayingTeam.kUnitMaxLOSDistance = 30
 PlayingTeam.kUnitMinLOSDistance = 8
 PlayingTeam.kTooltipHelpInterval = 1
+//TCBM: resource tooltip interval
+PlayingTeam.kTooltipResourceHelpInterval = 15
 
 // How often to compute LOS visibility for entities (seconds)
 PlayingTeam.kLOSUpdateInterval = 1
@@ -277,7 +279,7 @@ function PlayingTeam:SetCarbon(amount)
     end
     
 	//TCBM: Added max carbon
-    self.carbon = math.max(math.min(self.carbon + amount, kMaxCarbon), 0)
+    self.carbon = math.max(math.min(amount, kMaxCarbon), 0)
 	
     function PlayerSetCarbon(player)
         player.teamCarbon = self.carbon
@@ -295,8 +297,7 @@ end
 
 function PlayingTeam:AddCarbon(amount)
 	
-	//TCBM: max carbon
-    self:SetCarbon(math.min(self.carbon + amount,kMaxCarbon))
+    self:SetCarbon(self.carbon + amount)
     
 end
 
@@ -873,13 +874,15 @@ function PlayingTeam:UpdateHelp()
             if(not self:ProcessGeneralHelp(player)) then
             
                 if not self:ProcessEntityHelp(player) then
-                
+					if(player.timeOfLastResourceCheck == nil or (Shared.GetTime() > player.timeOfLastResourceCheck + PlayingTeam.kTooltipResourceHelpInterval)) then
+						player:ProcessPlayerResourceHelp()
+					end
                     player:UpdateHelp()
                     
                 end
                 
             end
-			//player:ProcessPlayerResourceHelp()
+			
         end
 
         self:ForEachPlayer(ProcessPlayerHelp)
@@ -1074,7 +1077,7 @@ function PlayingTeam:UpdateTeamSpecificGameEffects(teamEntities, enemyPlayers)
 			rand = NetworkRandom()
 			
             local stopFireChance = PlayingTeam.kUpdateGameEffectsInterval * stopFireProbability
-            Print ("stop %f minstop %f maxstop %f armorperc %f karmor %f stop %f rand %f ",stopFireProbability,minStopFireProbability,maxStopFireProbability,armorPercentage,entity.maxArmor,stopFireChance,rand)
+            //Print ("stop %f minstop %f maxstop %f armorperc %f karmor %f stop %f rand %f ",stopFireProbability,minStopFireProbability,maxStopFireProbability,armorPercentage,entity.maxArmor,stopFireChance,rand)
             if rand < stopFireChance then
             
                 entity:SetGameEffectMask(kGameEffect.OnFire, false)

@@ -193,7 +193,8 @@ function PurchaseTech(purchaseId)
     if techNode ~= nil then
     
         if techNode:GetAvailable() then
-        
+			//TCBM: Show player resources when buying
+			player:ProcessPlayerResourceHelp()
             if techNode:GetCost() <= player:GetPlasma() then
             
                 Client.ConsoleCommand("buy " .. tostring(purchaseId))

@@ -121,7 +121,7 @@ function HydraAbility:CreateHydra(player)
     if Server then
     
         local coords, valid = self:GetPositionForHydra(player)
-    
+
         local cost = LookupTechData(kTechId.Hydra, kTechDataCostKey)
         if valid and (player:GetPlasma() >= cost) then
         
@@ -147,7 +147,8 @@ function HydraAbility:CreateHydra(player)
             end
             
         end
-        
+  		//TCBM: Notify player of resources when trying to create hydra
+		player:ProcessPlayerResourceHelp()      
     end
     
 end

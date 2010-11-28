@@ -289,6 +289,11 @@ function Team:ReplaceRespawnAllPlayers()
     
 end
 
+//TCBM: Call processplayerresourcehelp for given player
+function Team:ProcessPlayerResourceHelp(player)
+	player:ProcessPlayerResourceHelp()
+end
+
 // For every player on team, call functor(player)
 function Team:ForEachPlayer(functor)
 

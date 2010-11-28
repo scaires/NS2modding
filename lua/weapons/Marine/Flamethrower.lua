@@ -150,7 +150,7 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
 						//Print("damage %d armorused %d, healthused %d",damage,armorUsed,healthUsed)
 						//if armorUsed == 0 then
 							ent:SetOnFire(player, self)
-							Print("Set on fire!")
+							//Print("Set on fire!")
 							// Play on fire cinematic
 							Shared.CreateEffect(nil, GetOnFireCinematic(ent), ent, Coords.GetIdentity())
 							Shared.CreateEffect(nil, Flamethrower.kImpactCinematic, ent, Coords.GetIdentity())

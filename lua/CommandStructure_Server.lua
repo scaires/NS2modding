@@ -14,7 +14,20 @@ function CommandStructure:OnKill(damage, attacker, doer, point, direction)
     self:Logout()
     
     Structure.OnKill(self, damage, attacker, doer, point, direction)
+	//TCBM: notify team that station was killed
+	local team = self:GetTeam()
+    team:ForEachPlayer( function (player) team:ProcessPlayerResourceHelp(player) end )
+end
 
+//TCBM: Used for resource HUD notifications
+function CommandStructure:OnConstructionComplete()
+
+    Structure.OnConstructionComplete(self)
+
+	//TCBM: notify all players that a new command was dropped
+	local team = self:GetTeam()
+    team:ForEachPlayer( function (player) team:ProcessPlayerResourceHelp(player) end )
+	
 end
 
 // Children should override this

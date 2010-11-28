@@ -800,10 +800,11 @@ function Player:ProcessPlayerResourceHelp()
 		local harvesters = math.ceil(self:GetDisplayTeamResourcers())
 		local techpoints = math.ceil(self:GetDisplayTeamTechPoints())
 		
-		local formatStringMarine = "Plas: %d | Carb: %d \n Res: %d | Cmd: %d"
-		local formatStringAlien = "Plas: %d | Carb: %d \n Res: %d | Hive: %d"
+		local formatStringMarine = "Plas: %d | Carb: %d \n Res: %d | Cmd: %d\0"
+		local formatStringAlien = "Plas: %d | Carb: %d \n Res: %d | Hive: %d\0"
 		local tooltiptext = ConditionalValue(self:isa("Marine"), formatStringMarine, formatStringAlien)
 		self:AddTooltip(string.format(tooltiptext,plasma,carbon,harvesters,techpoints))
+		self.timeOfLastResourceCheck = Shared.GetTime()
 	end
 end
 

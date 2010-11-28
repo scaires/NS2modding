@@ -68,6 +68,17 @@ function ResourceTower:OnConstructionComplete()
     
     self:SetNextThink(ResourceTower.kBuildDelay)
     
+	//TCBM: notify all players that a new tower was dropped
+	local team = self:GetTeam()
+    team:ForEachPlayer( function (player) team:ProcessPlayerResourceHelp(player) end )
+	
 end
 
-
+//TCBM: used for resource hud notifications
+function ResourceTower:OnKill(damage, attacker, doer, point, direction)
+    
+    Structure.OnKill(self, damage, attacker, doer, point, direction)
+	//TCBM: notify team that station was killed
+	local team = self:GetTeam()
+    team:ForEachPlayer( function (player) team:ProcessPlayerResourceHelp(player) end )
+end
