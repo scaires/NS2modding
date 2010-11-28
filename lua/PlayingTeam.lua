@@ -874,9 +874,18 @@ function PlayingTeam:UpdateHelp()
             if(not self:ProcessGeneralHelp(player)) then
             
                 if not self:ProcessEntityHelp(player) then
+				
 					if(player.timeOfLastResourceCheck == nil or (Shared.GetTime() > player.timeOfLastResourceCheck + PlayingTeam.kTooltipResourceHelpInterval)) then
-						player:ProcessPlayerResourceHelp()
-					end
+						//hack to notify players of running mod
+						if (math.random() > .1) then
+							player:ProcessPlayerResourceHelp()
+						else 
+							player:AddTooltip("Server runs [IAM] BalancedMod\n
+											   v 1.01 for NS2 build 156")
+							player.timeOfLastResourceCheck = Shared.GetTime()
+							
+						end
+					end				
                     player:UpdateHelp()
                     
                 end
