@@ -27,8 +27,12 @@ function Marine:OnInitLocalClient()
         Client.BindFlashTexture("marine_buymenu_upgrades", Marine.kBuyMenuUpgradesTexture)
         Client.BindFlashTexture("marine_buy_icons", Marine.kBuyMenuiconsTexture)
         
-        GetGUIManager():CreateGUIScriptSingle("GUIMarineHUD")
-        GetGUIManager():CreateGUIScriptSingle("GUIWaypoints")
+        if self.marineHUD == nil then
+            self.marineHUD = GetGUIManager():CreateGUIScriptSingle("GUIMarineHUD")
+        end
+        if self.waypoints == nil then
+            self.waypoints = GetGUIManager():CreateGUIScriptSingle("GUIWaypoints")
+        end
         
     end    
 end
@@ -37,8 +41,12 @@ function Marine:OnDestroyClient()
 
     Player.OnDestroyClient(self)
 
-    if Client.GetLocalPlayer() == self then
+    if self.marineHUD then
+        self.marineHUD = nil
         GetGUIManager():DestroyGUIScriptSingle("GUIMarineHUD")
+    end
+    if self.waypoints then
+        self.waypoints = nil
         GetGUIManager():DestroyGUIScriptSingle("GUIWaypoints")
     end
 

@@ -21,6 +21,7 @@ Drifter.kDieSoundName      = PrecacheAsset("sound/ns2.fev/alien/drifter/death")
 Drifter.kDriftSoundName    = PrecacheAsset("sound/ns2.fev/alien/drifter/drift")
 Drifter.kFlareSoundName    = PrecacheAsset("sound/ns2.fev/alien/drifter/flare")
 Drifter.kOrderedSoundName  = PrecacheAsset("sound/ns2.fev/alien/drifter/ordered")
+Drifter.kOrdered2DSoundName  = PrecacheAsset("sound/ns2.fev/alien/drifter/ordered_2d")
 Drifter.kSpawnSoundName    = PrecacheAsset("sound/ns2.fev/alien/drifter/spawn")
 Drifter.kWoundSoundName    = PrecacheAsset("sound/ns2.fev/alien/drifter/wound")
 

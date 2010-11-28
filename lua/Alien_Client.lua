@@ -24,8 +24,7 @@ function PlayerUI_GetBlipInfo()
 
     local player = Client.GetLocalPlayer()
     
-	//Temp fix for marine hivesight
-    if player and (not player:isa("Marine") and not player:isa("MarineCommander")) then
+    if player then
     
         for index, blip in ipairs(GetEntitiesIsa("Blip")) do
         

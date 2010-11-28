@@ -82,10 +82,7 @@ end
 
 // Claw attack, or blink if we're in that mode
 function SwipeBlink:PerformPrimaryAttack(player)
-	//for testing fire + blink
-	//if (player.SetGameEffectMask ~= nil) then
-	//	player:SetGameEffectMask(kGameEffect.OnFire, true)
-	//end
+    
     // Delete ghost
     Blink.PerformPrimaryAttack(self, player)
 

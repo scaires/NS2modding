@@ -265,7 +265,8 @@ function Sentry:UpdateSetTarget()
             // Move sentry to face target point
             local currentYaw = self:GetAngles().yaw
             local desiredYaw = GetYawFromVector(vecToTarget)
-            local newYaw = InterpolateAngle(currentYaw, desiredYaw, .16)
+            //TCBM: Quadrupled turn rate
+			local newYaw = InterpolateAngle(currentYaw, desiredYaw, .16)
 
             local angles = Angles(self:GetAngles())
             angles.yaw = newYaw

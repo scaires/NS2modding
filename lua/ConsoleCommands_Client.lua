@@ -23,7 +23,7 @@ end
 
 function OnCommandOnResetGame()
 
-    //Scoreboard_OnResetGame()
+    Scoreboard_OnResetGame()
     CommanderUI_SetTeamHarvesterCount(0)
 
     ResetLights()

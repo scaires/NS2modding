@@ -11,11 +11,20 @@ function ScriptActor:SetOwner(player)
 
     local success = false
     
+    if player ~= nil and self.ownerServerClient ~= nil then
+        Shared.Message("Warning: A ScriptActor cannot have more than one owner!")
+        return false
+    end
+    
     if player == nil then
+        if self.ownerServerClient and self.ownerServerClient:GetControllingPlayer() then
+            self.ownerServerClient:GetControllingPlayer():SetIsOwner(self, false)
+        end
         self.ownerServerClient = nil
         success = true
-    elseif player:isa("Player") or player:isa("Bot") then
+    elseif player:isa("Player") then
         self.ownerServerClient = player:GetClient()
+        player:SetIsOwner(self, true)
         success = true
     else
         Print("%s:SetOwner(): Must be called with a Player (not a %s)", self:GetClassName(), player:GetClassName())
@@ -23,6 +32,20 @@ function ScriptActor:SetOwner(player)
     
     return success
     
+end
+
+/**
+ * Sets whether the ScriptActor is or isn't the owner of the passed in entity.
+ * This is needed for proper destruction.
+ */
+function ScriptActor:SetIsOwner(ofEntity, isOwner)
+
+    if isOwner then
+        table.insertunique(self.ownedEntities, ofEntity)
+    else
+        table.removevalue(self.ownedEntities, ofEntity)
+    end
+
 end
 
 function ScriptActor:GetOwner()
@@ -120,7 +143,19 @@ function ScriptActor:SetTeamNumber(teamNumber)
 end
 
 function ScriptActor:OnDestroy()
-
+    
+    // Remove all owned entities.
+    function RemoveOwnedEntityFunctor(entity)
+        entity:SetOwner(nil)
+    end
+    table.foreachfunctor(self.ownedEntities, RemoveOwnedEntityFunctor)
+    table.clear(self.ownedEntities)
+    
+    // Notify the owner of this ScriptActor it is no longer the owner.
+    if self:GetOwner() then
+        self:GetOwner():SetIsOwner(self, false)
+    end
+    
     // Notify others of the change 
     self:SendEntityChanged(nil)
     

@@ -108,7 +108,7 @@ function Crag:GetSortedTargetList()
         end
         
         // Heal most hurt entities first (looks at total percentage of health)
-        if ent1:GetHealthScalar() < ent2:GetHealthScalar() then
+        if ent1:GetHealthScalar() <= ent2:GetHealthScalar() then
             return true
         end
                 

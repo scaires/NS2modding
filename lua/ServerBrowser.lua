@@ -163,7 +163,7 @@ function GetServerRecord(serverIndex)
             Client.GetServerName(serverIndex),
             Client.GetServerGameMode(serverIndex),
             GetTrimmedMapName(Client.GetServerMapName(serverIndex)),
-            Client.GetServerNumPlayers(serverIndex),
+            Client.GetServerNumPlayers(serverIndex) .. "/" .. Client.GetServerMaxPlayers(serverIndex),
             Client.GetServerPing(serverIndex),
             Client.GetServerAddress(serverIndex),
             Client.GetServerRequiresPassword(serverIndex)

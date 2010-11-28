@@ -362,7 +362,7 @@ end
 // Return true if the event should be stopped here.
 function OnSendKeyEvent(key, down)
 
-    if Client.GetLocalPlayer() ~= nil and not Client.GetIsRunningPrediction() then
+    if not Client.GetIsRunningPrediction() then
     
         return gGUIManager:SendKeyEvent(key, down)
         
@@ -375,7 +375,7 @@ end
 // Return true if the event should be stopped here.
 function OnSendCharacterEvent(character)
 
-    if Client.GetLocalPlayer() ~= nil and not Client.GetIsRunningPrediction() then
+    if not Client.GetIsRunningPrediction() then
     
         return gGUIManager:SendCharacterEvent(character)
         
@@ -460,6 +460,8 @@ function OnMapPostLoad()
     Client.SetMinMaxSoundDistance(7, 100)
     
     CreateDSPs()
+    
+    Scoreboard_Clear()
     
 end
 

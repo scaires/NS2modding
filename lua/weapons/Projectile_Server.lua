@@ -96,9 +96,9 @@ end
 
 function Projectile:SetOwner(player)
 
-    ScriptActor.SetOwner(self, player)
+    local success = ScriptActor.SetOwner(self, player)
     
-    if (player ~= nil) then
+    if (player ~= nil and self.physicsBody and player:GetController()) then
     
         // Make sure the owner cannot collide with the projectile
         Shared.SetPhysicsObjectCollisionsEnabled(self.physicsBody, player:GetController(), false)
@@ -106,6 +106,8 @@ function Projectile:SetOwner(player)
         player:GetPhysicsModel():SetCollisionsEnabled(self.physicsBody, false)
         
     end
+    
+    return success
     
 end
 

@@ -66,7 +66,7 @@ end
 function Fade:OnInit()
     
     Alien.OnInit(self)
-
+    
     self.blinkState = Fade.kBlinkState.Normal
 
 end

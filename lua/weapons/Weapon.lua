@@ -196,32 +196,6 @@ function Weapon:AttackMeleeCapsule(player, damage, range)
     
 end
 
-/**
- * Performs melee attack and applies damage on hit. Traces a ray from the player center along view for range.
- * Returns true/false if it hit something or not and the trace results.
- */
-function Weapon:AttackMelee(player, damage, range)
-
-    local startPoint = player:GetViewOffset() + player:GetOrigin()
-    local endPoint = startPoint + player:GetViewAngles():GetCoords().zAxis * range
-    
-    local trace = Shared.TraceRay(startPoint, endPoint, PhysicsMask.AllButPCs, EntityFilterOne(player))
-    
-    if (trace.fraction < 1) then
-
-        self:CreateHitEffect(player, trace.endPoint - GetNormalizedVector(endPoint - startPoint) * Weapon.kHitEffectOffset, trace.surface)
-        
-        if Server then
-            local direction = (trace.endPoint - startPoint):GetUnit()
-            self:ApplyMeleeHitEffects(player, damage, trace.entity, trace.endPoint, direction)
-        end
-            
-    end
-    
-    return (trace.fraction < 1), trace
-    
-end
-
 function Weapon:ConstrainMoveVelocity(moveVelocity)
 end
 

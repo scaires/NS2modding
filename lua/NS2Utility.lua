@@ -956,7 +956,7 @@ end
 
 function GetEngagementDistance(entIdOrTechId, trueTechId)
 
-    local distance
+    local distance = 2
     local success = true
     
     local techId = entIdOrTechId

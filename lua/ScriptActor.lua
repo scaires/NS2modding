@@ -70,6 +70,8 @@ function ScriptActor:OnCreate()
     self.attachedId = Entity.invalidId
     
     self.ownerServerClient = nil
+    // Stores all the entities that are owned by this ScriptActor.
+    self.ownedEntities = { }
     
     self.locationId = 0
     

@@ -115,7 +115,7 @@ end
 
 function OnCommandDarwinMode(client)
 
-    if (client == nil or (client:GetIsLocalPlayer() and Shared.GetCheatsEnabled())) then
+    if (client == nil or Shared.GetCheatsEnabled()) then
         GetGamerules():SetDarwinMode(not GetGamerules():GetDarwinMode())
     end
     

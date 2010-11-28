@@ -82,9 +82,7 @@ function Rifle:OnInit()
 
     ClipWeapon.OnInit(self)
     
-    if Server then
     self.soundType = Shared.GetRandomInt(1, 3)
-    end
     
 end
 
@@ -218,14 +216,15 @@ end
 
 function Rifle:OnDestroy()
 
-    Shared.StopSound(player, self:GetFireSoundName())
+    self:StopPrimaryAttackSound()
+    
     ClipWeapon.OnDestroy(self)
     
 end
 
 function Rifle:OnHolster(player)
 
-    Shared.StopSound(player, self:GetFireSoundName())
+    self:StopPrimaryAttackSound()
     
     ClipWeapon.OnHolster(self, player)
     
@@ -247,23 +246,17 @@ function Rifle:OnPrimaryAttackEnd(player)
 
     self:SetOverlayAnimation( nil )
     
-    Shared.StopSound(player, self:GetFireSoundName())
+    self:StopPrimaryAttackSound()
     
     self:CreateWeaponEffect(player, Weapon.kHumanAttachPoint, Rifle.kMuzzleNode, self:GetBarrelSmokeEffect())
-    
-    self.loopingWeaponSoundPlaying = 0
-    
-    Shared.PlaySound(player, Rifle.fireEndSoundName)
     
     self.timeStartedAttack = nil
     
 end
 
-function Rifle:DoMelee()
+function Rifle:DoMelee(player)
 
-    local player = self:GetParent()
-
-    Shared.StopSound(player, self:GetFireSoundName())
+    self:StopPrimaryAttackSound()
     
     self.lastAttackSecondary = true
     
@@ -277,7 +270,7 @@ end
 function Rifle:PerformMeleeAttack(player)
 
     // Perform melee attack
-    local didHit, trace = self:AttackMelee(player, Rifle.kButtDamage, Rifle.kButtRange)
+    local didHit, trace = self:AttackMeleeCapsule(player, Rifle.kButtDamage, Rifle.kButtRange)
     
     if ( didHit ) then
 
@@ -332,7 +325,7 @@ function Rifle:OnSecondaryAttack(player)
         player:SetOverlayAnimation(Rifle.kPlayerAnimSecondaryAttack)
         player:DeactivateWeaponLift()
         
-        self:DoMelee()
+        self:DoMelee(player)
         
         Shared.PlaySound(player, Rifle.kMeleeAnims[index][3])
 
@@ -367,7 +360,7 @@ function Rifle:PlayPrimaryAttackSound(player)
     if(not GetTechSupported(player, kTechId.RifleUpgradeTech)) then
     
         // Play single shot (concurrently with loop) the first time we fire
-        if(self.loopingWeaponSoundPlaying == 0) then
+        if self.loopingWeaponSoundPlaying == 0 then
         
             Shared.PlaySound(player, Rifle.fireSingleSoundTable[self.soundType])
             
@@ -379,12 +372,25 @@ function Rifle:PlayPrimaryAttackSound(player)
     
 end
 
+function Rifle:StopPrimaryAttackSound()
+
+    local player = self:GetParent()    
+    Shared.StopSound(player, self:GetFireSoundName())
+    
+    if self.loopingWeaponSoundPlaying == 1 then
+    
+        self.loopingWeaponSoundPlaying = 0     
+        Shared.PlaySound(player, Rifle.fireEndSoundName)
+        
+    end
+    
+end
 
 function Rifle:OnReload(player)
 
     if ( self:CanReload() ) then
     
-        Shared.StopSound(player, self:GetFireSoundName())
+        self:StopPrimaryAttackSound()
         
         ClipWeapon.OnReload(self, player)
         
