@@ -880,7 +880,7 @@ function PlayingTeam:UpdateHelp()
 						if (math.random() > .1) then
 							player:ProcessPlayerResourceHelp()
 						else 
-							player:AddTooltip("Server runs [IAM] BalancedMod\nv 1.01 for NS2 build 156")
+							player:AddTooltip("Server runs [IAM] BalancedMod\nv 1.02 for NS2 build 156")
 							player.timeOfLastResourceCheck = Shared.GetTime()
 							
 						end
