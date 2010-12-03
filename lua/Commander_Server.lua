@@ -138,6 +138,9 @@ function Commander:AttemptToBuild(techId, origin, pickVec, buildTech, builderEnt
             // Play private version for commander too 
             Shared.PlayPrivateSound(self, self:GetPlaceBuildingSound(), nil, 1.0, self:GetOrigin())
             
+            local replicateEffect = ConditionalValue(GetTechUpgradesFromTech(techId, kTechId.CommandStation), CommandStation.kMarineReplicateBigEffect, CommandStation.kMarineReplicateEffect)
+            Shared.CreateEffect(nil, replicateEffect, newEnt, nil)
+            
             if newEnt.GetPlaceBuildingEffect then
                 Shared.CreateEffect(nil, newEnt:GetPlaceBuildingEffect(), newEnt)
             end
@@ -170,7 +173,7 @@ function Commander:ProcessTechTreeActionForEntity(techNode, position, pickVec, e
 
     // First make sure tech is allowed for entity
     local techId = techNode:GetTechId()
-    local techButtons = entity:GetTechButtons(self.currentMenu)
+    local techButtons = self:GetCurrentTechButtons(self.currentMenu, entity)
     
     if(techButtons == nil or table.find(techButtons, techId) == nil) then
         return success, keepProcessing
@@ -205,7 +208,7 @@ function Commander:ProcessTechTreeActionForEntity(techNode, position, pickVec, e
                                 
             elseif(techNode:GetIsBuild()) then
             
-                success = self:AttemptToBuild(techId, position, pickVec, true)
+                success = self:AttemptToBuild(techId, position, pickVec, false)
                 if success then 
                     keepProcessing = false
                 end
@@ -242,17 +245,13 @@ function Commander:ProcessTechTreeActionForEntity(techNode, position, pickVec, e
                 
             elseif(techNode:GetIsBuy()) then
             
-                if not techNode:GetRequiresTarget() then
-                    position = Vector(entity:GetOrigin())
-                end
-                
                 success = self:AttemptToBuild(techId, position, pickVec, false)
                 
             end
             
             if(success and cost ~= nil) then
             
-                self:DeductPlasma(cost)
+                self:AddPlasma(-cost)
                 Shared.PlayPrivateSound(self, Commander.kSpendPlasmaSoundName, nil, 1.0, self:GetOrigin())
                 
             end
@@ -432,6 +431,12 @@ function Commander:ProcessTechTreeAction(techId, pickVec, orientation, worldCoor
                     
             end
             
+            // On successful action, allow selection to receive orders
+            //if success then
+            //    for index, selectedEntity in ipairs(self.selectedSubGroupEntities) do
+            //    end
+            //end
+            
         end
         
     end
@@ -461,6 +466,10 @@ function Commander:GetIsEntityHotgrouped(entity)
     
     return false
     
+end
+
+function Commander:GiveOrderToSelection(orderType, targetId)
+
 end
 
 // Creates hotkey for number out of current selection. Returns true on success.
@@ -692,7 +701,12 @@ end
 
 function Commander:Logout()
 
-    self.commandStructure:Logout()
+    local commandStructure = Shared.GetEntity(self.commandStationId)
+    commandStructure:Logout()
         
+end
+
+function Commander:SetCommandStructure(commandStructure)
+    self.commandStationId = commandStructure:GetId()
 end
 

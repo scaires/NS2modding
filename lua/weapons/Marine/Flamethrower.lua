@@ -28,6 +28,7 @@ Flamethrower.kBurnBigCinematic = PrecacheAsset("cinematics/marine/flamethrower/b
 Flamethrower.kBurnHugeCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_huge.cinematic")
 Flamethrower.kBurnMedCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_med.cinematic")
 Flamethrower.kBurnSmallCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_small.cinematic")
+Flamethrower.kBurn1PCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_1p.cinematic")
 Flamethrower.kFlameCinematic = PrecacheAsset("cinematics/marine/flamethrower/flame.cinematic")
 Flamethrower.kFlameFirstPersonCinematic = PrecacheAsset("cinematics/marine/flamethrower/flame_1p.cinematic")
 Flamethrower.kFlameoutCinematic = PrecacheAsset("cinematics/marine/flamethrower/flameout.cinematic")
@@ -146,7 +147,6 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
                     ent:SetOnFire(player, self)
                     
                     // Play on fire cinematic
-                    Shared.CreateEffect(nil, GetOnFireCinematic(ent), ent, Coords.GetIdentity())
                     Shared.CreateEffect(nil, Flamethrower.kImpactCinematic, ent, Coords.GetIdentity())
                     
                 end

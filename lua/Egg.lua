@@ -86,7 +86,7 @@ function Egg:QueueWaitingPlayer()
     // Get team
     local success = false
     
-    if(self.queuedPlayerId == nil) then
+    if(self.queuedPlayerId == nil and (self:GetId() ~= Entity.invalidId)) then
 
         // Remove player from team spawn queue and add here
         local team = self:GetTeam()

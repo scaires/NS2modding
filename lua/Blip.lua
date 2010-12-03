@@ -28,11 +28,19 @@ function Blip:OnCreate()
     
 end
 
+function Blip:OnGetIsRelevant(player)
+    return GetGamerules():GetIsRelevant(player, self)   
+end
+
 function Blip:Update(entity, blipType, time)
 
     self.blipType = blipType
-        
-    self:SetOrigin(entity:GetModelOrigin())
+
+    if entity.GetEngagementPoint then
+        self:SetOrigin(entity:GetEngagementPoint())
+    else
+        self:SetOrigin(entity:GetModelOrigin())
+    end
     
     self.entId = entity:GetId()
     

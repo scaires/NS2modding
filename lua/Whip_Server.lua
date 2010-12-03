@@ -94,7 +94,7 @@ function Whip:AttackTarget()
         // Play animation, sound and do damage
         self:PlaySound(Whip.kStrikeSoundEffect)
         
-        self:SetAnimation(Whip.kAnimAttack, nil, nil, 1/self:AdjustFuryFireDelay(1))
+        self:SetAnimation(Whip.kAnimAttack, true, 1/self:AdjustFuryFireDelay(1))
         
         self.timeOfLastStrikeStart = Shared.GetTime()
         

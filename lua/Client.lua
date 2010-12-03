@@ -342,12 +342,8 @@ function OnUpdateClient(deltaTime)
             
             UpdateTracers(deltaTime)
             
-            if Client.GetMoveBufferAtMax() then
-                // Only display the warning if the client has been connected for some time
-                // as the connection will "settle down" after the initial burst of connecting.
-                if Shared.GetTime() - Client.GetConnectionTime() > 30 then
-                    player:AddTooltipOncePer("Connection problems detected...", 5)
-                end
+            if Client.GetConnectionProblems() then
+                player:AddTooltipOncePer("Connection problems detected...", 5)
             end
             
         end

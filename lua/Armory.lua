@@ -23,13 +23,11 @@ Armory.kAmmoSound = PrecacheAsset("sound/ns2.fev/marine/common/pickup_ammo")
 Armory.kResupplyEffect = PrecacheAsset("cinematics/marine/spawn_item.cinematic")
 Armory.kDeathEffect = PrecacheAsset("cinematics/marine/armory/death.cinematic")
 Armory.kBuyItemEffect = PrecacheAsset("cinematics/marine/armory/buy_item_effect.cinematic")
-Armory.kPrototypeBuyItemEffect = PrecacheAsset("cinematics/marine/prototypemodule/buy_item_effect.cinematic")
 
 Armory.kArmoryBuyMenuUpgradesTexture = "ui/marine_buymenu_upgrades.dds"
 Armory.kAttachPoint = "Root"
 
 Armory.kAdvancedArmoryChildModel = PrecacheAsset("models/marine/advanced_armory/advanced_armory.model")
-Armory.kPrototypeModuleChildModel = PrecacheAsset("models/marine/prototype_module/prototype_module.model")
 Armory.kWeaponsModuleChildModel = PrecacheAsset("models/marine/weapons_module/weapons_module.model")
 
 Armory.kBuyMenuFlash = "ui/marine_buy.swf"
@@ -138,52 +136,29 @@ function Armory:GetTechButtons(techId)
     
     if(techId == kTechId.RootMenu) then 
     
-        techButtons = { kTechId.ArmoryUpgradesMenu, kTechId.None, kTechId.None, kTechId.None,
-                        kTechId.RifleUpgradeTech, kTechId.ShotgunTech, kTechId.None, kTechId.CatPackTech,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle }
+        techButtons = { kTechId.ArmoryUpgradesMenu, kTechId.ArmoryEquipmentMenu, kTechId.None, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.Recycle, kTechId.None }
     
         // Show button to upgraded to advanced armory
-        if(self:GetTechId() == kTechId.Armory) then
+        if(self:GetTechId() == kTechId.Armory) then        
         
             techButtons[kMarineUpgradeButtonIndex] = kTechId.AdvancedArmoryUpgrade
-
-        // Show buttons to build on modules            
-        elseif(self:GetTechId() == kTechId.AdvancedArmory) then
-        
-            techButtons[kMarineUpgradeButtonIndex] = kTechId.WeaponsModule
-            techButtons[kMarineUpgradeButtonIndex + 1] = kTechId.PrototypeModule
             
-        end
+        elseif self:GetTechId() == kTechId.AdvancedArmory then
         
-        // Allow these weapon upgrades at advanced armory and all modules
-        if self:GetTechId() ~= kTechId.Armory then        
-           techButtons[7] = kTechId.GrenadeLauncherTech           
-        end
-        
-        // Add module upgrade buttons
-        if self:GetTechId() == kTechId.WeaponsModule then
-            techButtons[2] = kTechId.ArmoryWeaponModuleMenu
-        elseif self:GetTechId() == kTechId.PrototypeModule then
-            techButtons[2] = kTechId.ArmoryPrototypeModuleMenu
+            techButtons[kMarineUpgradeButtonIndex] = kTechId.WeaponsModule            
+            
         end
         
     elseif(techId == kTechId.ArmoryUpgradesMenu) then
     
         techButtons = { kTechId.Weapons1, kTechId.Weapons2, kTechId.Weapons3, kTechId.None,
-                        kTechId.Armor1, kTechId.Armor2, kTechId.Armor3, kTechId.None,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu  }
-
-    elseif(techId == kTechId.ArmoryWeaponModuleMenu) then
+                        kTechId.Armor1, kTechId.Armor2, kTechId.Armor3, kTechId.RootMenu }
+                        
+    elseif(techId == kTechId.ArmoryEquipmentMenu) then
     
-        techButtons = { kTechId.FlamethrowerTech, kTechId.FlamethrowerAltTech, kTechId.None, kTechId.None,
-                        kTechId.NerveGasTech, kTechId.DualMinigunTech, kTechId.None, kTechId.None,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu  }
-
-    elseif(techId == kTechId.ArmoryPrototypeModuleMenu) then
-    
-            techButtons = { kTechId.JetpackTech, kTechId.JetpackFuelTech, kTechId.JetpackArmorTech, kTechId.None,
-                            kTechId.ExoskeletonTech, kTechId.ExoskeletonLockdownTech, kTechId.ExoskeletonUpgradeTech, kTechId.None,
-                            kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu  }
+        techButtons = { kTechId.ShotgunTech, kTechId.GrenadeLauncherTech, kTechId.FlamethrowerTech, kTechId.JetpackTech, 
+                        kTechId.ExoskeletonTech, kTechId.None, kTechId.None, kTechId.RootMenu }
 
     end
     
@@ -245,7 +220,6 @@ function Armory:OnUpdate(deltaTime)
         // Update animation for add-on modules as they're being built
         self:SetPoseParamForResearch(kTechId.AdvancedArmoryUpgrade, Armory.kAdvancedArmoryChildModel, children)
         self:SetPoseParamForResearch(kTechId.WeaponsModule, Armory.kWeaponsModuleChildModel, children)
-        self:SetPoseParamForResearch(kTechId.PrototypeModule, Armory.kPrototypeModuleChildModel, children)
         
         // Set pose parameters according to if we're logged in or not
         if self.timeLastUpdate ~= nil then

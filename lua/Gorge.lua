@@ -563,8 +563,6 @@ function Gorge:UpdateHelp()
         return true       
     elseif activeWeaponName == "HydraAbility" and self:AddTooltipOnce("Hydras can even be built on walls and ceilings!") then
         return true       
-    elseif self:AddTooltipOnce("Hold crouch to extend your armor for temporary protection.") then
-        return true
     elseif self:AddTooltipOnce("Hold shift while moving belly slide!") then
         return true
     end

@@ -13,14 +13,20 @@ kTechId = enum({
     // General orders and actions ("Default" is right-click)
     'Default', 'Move', 'Attack', 'Build', 'Construct', 'Cancel', 'Recycle', 'Weld', 'Stop', 'SetRally', 'SetTarget',
     
-    // Generic menus for selected units
-    'RootMenu', 'BuildMenu', 'OrdersMenu', 'MarkersMenu', 'UpgradesMenu', 'ReplicateMenu',
+    // Commander menus for selected units
+    'RootMenu', 'BuildMenu', 'AdvancedMenu', 'AssistMenu', 'SquadMenu', 'MarkersMenu', 'UpgradesMenu',
     
     // Command station menus
     'CommandStationUpgradesMenu',
     
     // Armory menus
-    'ArmoryUpgradesMenu', 'ArmoryWeaponModuleMenu', 'ArmoryPrototypeModuleMenu',
+    'ArmoryUpgradesMenu', 'ArmoryEquipmentMenu',
+    
+    // Robotics factor menus
+    'RoboticsFactoryARCUpgradesMenu', 'RoboticsFactoryMACUpgradesMenu',
+    
+    // Prototype lab menus
+    'PrototypeLabUpgradesMenu',
 
     'ReadyRoomPlayer', 
     
@@ -44,16 +50,16 @@ kTechId = enum({
     
     'MarineAlertResearchComplete', 'MarineAlertUpgradeComplete', 'MarineAlertOrderComplete', 'MarineAlertWeldingBlocked', 'MarineAlertMACBlocked', 'MarineAlertNotEnoughResources', 'MarineAlertObjectiveCompleted', 'MarineAlertConstructionComplete',
     
+    // Select squads
+    'SelectRedSquad', 'SelectBlueSquad', 'SelectGreenSquad', 'SelectYellowSquad', 'SelectOrangeSquad',
+    
     // Marine orders 
     'SquadMove', 'SquadAttack', 'SquadDefend', 'SquadSeekAndDestroy', 'SquadHarass', 'SquadRegroup', 
     
     // Marine tech 
-    'CommandStation', 'CommandFacility', 'CommandCenter', 'MAC', 'Armory', 'InfantryPortal', 'Extractor', 'ExtractorUpgrade', 'SentryTech', 'Sentry', 'MASC', 'InfantryPortalTransponderTech', 'InfantryPortalTransponderUpgrade', 'InfantryPortalTransponder',
+    'CommandStation', 'CommandFacility', 'CommandCenter', 'MAC', 'Armory', 'InfantryPortal', 'Extractor', 'ExtractorUpgrade', 'SentryTech', 'Sentry', 'ARC', 'InfantryPortalTransponderTech', 'InfantryPortalTransponderUpgrade', 'InfantryPortalTransponder',
     'Scan', 'AmmoPack', 'MedPack', 'CatPack', 'CatPackTech', 'PowerPoint', 'AdvancedArmoryUpgrade', 'Observatory', 'ObservatoryEnergy', 'DistressBeacon', 'RoboticsFactory', 
-    'WeaponsModule', 'PrototypeModule', 'AdvancedArmory', 'CommandFacilityUpgrade', 'CommandCenterUpgrade', 
-    
-    // Replicate actions
-    'ReplicateCommandStation', 'ReplicateExtractor', 'ReplicateInfantryPortal', 'ReplicateArmory', 'ReplicateSentry', 'ReplicateObservatory', 'ReplicateRoboticsFactory', 'ReplicateMAC', 'ReplicateMASC',
+    'WeaponsModule', 'PrototypeLab', 'AdvancedArmory', 'CommandFacilityUpgrade', 'CommandCenterUpgrade', 
     
     // Weapon tech
     'RifleUpgradeTech', 'ShotgunTech', 'GrenadeLauncherTech', 'FlamethrowerTech', 'NerveGasTech', 'FlamethrowerAltTech', 'DualMinigunTech',
@@ -62,7 +68,7 @@ kTechId = enum({
     'RifleUpgrade', 'NerveGas', 'FlamethrowerAlt',
     
     // Research 
-    'PhaseTech', 'MACWeldingTech', 'MACSpeedTech', 'MACMinesTech', 'MACEMPTech', 'MASCArmorTech', 'MASCSplashTech', 'JetpackTech', 'ExoskeletonTech',
+    'PhaseTech', 'MACWeldingTech', 'MACSpeedTech', 'MACMinesTech', 'MACEMPTech', 'ARCArmorTech', 'ARCSplashTech', 'JetpackTech', 'ExoskeletonTech',
     
     // MAC (build bot) abilities
     'MACMine', 'MACEMP',
@@ -77,7 +83,7 @@ kTechId = enum({
     'Weapons1', 'Weapons2', 'Weapons3', 'Armor1', 'Armor2', 'Armor3',
     
     // Activations
-    'MASCDeploy', 'MASCUndeploy',
+    'ARCDeploy', 'ARCUndeploy',
     
     // Commander abilities
     'NanoDefense', 'ReplicateTech',
@@ -141,7 +147,7 @@ kTechIdMax  = kTechId.Max
 kTechType = enum({ 'Invalid', 'Order', 'Research', 'Upgrade', 'Action', 'Buy', 'Build', 'Manufacture', 'Activation', 'Menu', 'EnergyBuild', 'Special' })
 
 // Button indices
-kRecycleButtonIndex         = 12
-kMarineUpgradeButtonIndex   = 9
+kRecycleButtonIndex         = 7
+kMarineUpgradeButtonIndex   = 5
 kAlienBackButtonIndex       = 8
 

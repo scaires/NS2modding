@@ -208,9 +208,6 @@
     <filename>Reverb.lua</filename>
   </file>
   <file>
-    <filename>MASC.lua</filename>
-  </file>
-  <file>
     <filename>Armory_Client.lua</filename>
   </file>
   <file>
@@ -701,5 +698,11 @@
   </file>
   <file>
     <filename>Blip.lua</filename>
+  </file>
+  <file>
+    <filename>PrototypeLab.lua</filename>
+  </file>
+  <file>
+    <filename>ARC.lua</filename>
   </file>
 </project>

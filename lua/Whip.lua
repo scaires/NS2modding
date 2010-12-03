@@ -122,6 +122,9 @@ function Whip:UpdatePoseParameters(deltaTime)
     
 end
 
+function Whip:GetCanDoDamage()
+    return true
+end
 
 Shared.LinkClassToMap("Whip", Whip.kMapName, networkVars)
 
@@ -132,5 +135,6 @@ MatureWhip.kMapName = "maturewhip"
 function MatureWhip:GetTechId()
     return kTechId.MatureWhip
 end
+
 
 Shared.LinkClassToMap("MatureWhip", MatureWhip.kMapName, networkVars)

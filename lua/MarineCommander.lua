@@ -85,6 +85,41 @@ function MarineCommander:OnSelectionChanged()
 
 end
 
+// Top row always the same. Alien commander can override to replace. 
+function MarineCommander:GetTopRowTechButtons()
+    return { kTechId.BuildMenu, kTechId.AdvancedMenu, kTechId.AssistMenu, kTechId.SquadMenu }
+end
+
+function MarineCommander:GetSelectionRowsTechButtons(techId)
+
+    local techButtons = {}
+    
+    if(techId == kTechId.BuildMenu) then 
+    
+        techButtons = { kTechId.CommandStation, kTechId.Extractor, kTechId.InfantryPortal, kTechId.Armory,
+                        kTechId.Sentry, kTechId.None, kTechId.None, kTechId.RootMenu}
+                        
+    elseif(techId == kTechId.AdvancedMenu) then 
+    
+        techButtons = { kTechId.Observatory, kTechId.RoboticsFactory, kTechId.PrototypeLab, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu}
+        
+    elseif(techId == kTechId.AssistMenu) then 
+    
+        techButtons = { kTechId.AmmoPack, kTechId.MedPack, kTechId.None, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu}
+        
+    elseif(techId == kTechId.SquadMenu) then 
+    
+        techButtons = { kTechId.SelectRedSquad, kTechId.SelectBlueSquad, kTechId.SelectGreenSquad, kTechId.SelectYellowSquad,
+                        kTechId.SelectOrangeSquad, kTechId.None, kTechId.None, kTechId.RootMenu}
+
+    end
+    
+    return techButtons
+    
+end
+
 function MarineCommander:ProcessNumberKeysMove(input, newPosition)
 
     if (bit.band(input.commands, Move.MovementModifier) ~= 0) then

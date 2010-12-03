@@ -107,7 +107,9 @@ function PlayingTeam:InitTechTree()
     // Menus
     self.techTree:AddMenu(kTechId.RootMenu)
     self.techTree:AddMenu(kTechId.BuildMenu)
-    self.techTree:AddMenu(kTechId.OrdersMenu)
+    self.techTree:AddMenu(kTechId.AdvancedMenu)
+    self.techTree:AddMenu(kTechId.AssistMenu)
+    self.techTree:AddMenu(kTechId.SquadMenu)
     
     // Orders
     self.techTree:AddOrder(kTechId.Default)
@@ -436,6 +438,8 @@ function PlayingTeam:ReplaceRespawnPlayer(player, origin, angles)
     local newPlayer = player:Replace(self.respawnEntity, self:GetTeamNumber(), false)
     
     self:RespawnPlayer(newPlayer, origin, angles)
+    
+    newPlayer:ClearGameEffects()
     
     return (newPlayer ~= nil), newPlayer
     
@@ -1062,10 +1066,6 @@ function PlayingTeam:UpdateTeamSpecificGameEffects(teamEntities, enemyPlayers)
             
                 entity:SetGameEffectMask(kGameEffect.OnFire, false)
 
-            elseif NetworkRandom() < .5 then
-            
-                Shared.CreateEffect(nil, GetOnFireCinematic(entity), entity, Coords.GetIdentity())
-                
             end
             
         end

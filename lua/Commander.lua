@@ -44,14 +44,19 @@ else
 end
 
 Commander.kMaxSubGroupIndex = 32
+
+Commander.kSelectMode = enum( {'None', 'SelectedGroup', 'JumpedToGroup'} )
+
 local networkVars = 
 {
     timeScoreboardPressed   = "float",
     focusGroupIndex         = string.format("integer (0 to %d)", Commander.kMaxSubGroupIndex - 1),
     numIdleWorkers          = string.format("integer (0 to %d)", kMaxIdleWorkers),
     commanderCancel         = "boolean",
+    commandStationId        = "entityid",
     // Set to a number after a hotgroup is selected, so we know to jump to it next time we try to select it
-    gotoHotKeyGroup         = "integer (0 to 5)"
+    positionBeforeJump      = "vector",
+    selectMode              = "enum Commander.kSelectMode"
 }
 
 function Commander:OnInit()
@@ -107,8 +112,16 @@ function Commander:OnInit()
     self.timeScoreboardPressed = 0
     self.focusGroupIndex = 0
     self.numIdleWorkers = 0
-    self.gotoHotKeyGroup = 0
+    self.positionBeforeJump = Vector(0, 0, 0)
+    self:SetSelectMode(Commander.kSelectMode.None)
+    self.commandStationId = Entity.invalidId
     
+end
+
+function Commander:SetSelectMode(mode)
+    if mode ~= self.selectMode then
+        self.selectMode = mode
+    end
 end
 
 // Needed so player origin is same as camera for selection
@@ -253,6 +266,8 @@ function Commander:UpdateMovePhysics(input)
             finalPos.x = finalPos.x - Commander.kViewOffsetXHeight
             
         end
+
+        self:SetSelectMode(Commander.kSelectMode.None)
         
     // Returns true if player jumped to a hotkey group
     elseif not self:ProcessNumberKeysMove(input, finalPos) then
@@ -263,6 +278,8 @@ function Commander:UpdateMovePhysics(input)
         
         // Set final position (no collision)
         finalPos = self:GetOrigin() + velocity * input.time
+
+        self:SetSelectMode(Commander.kSelectMode.None)
         
     end
     
@@ -345,27 +362,31 @@ function Commander:ProcessNumberKeysMove(input, newPosition)
         elseif (bit.band(input.commands, Move.MovementModifier) == 0) then
         
             // Temporarily removed jumping to a hotkey group because it doesn't work well
-            if number ~= self.gotoHotKeyGroup then
+            if self.selectMode == Commander.kSelectMode.None then
             
                 self:SelectHotkeyGroup(number)
-                self.positionBeforeGoto = nil
+                
+                self.positionBeforeJump = Vector(self:GetOrigin())
+                self:SetSelectMode(Commander.kSelectMode.SelectedGroup)
+                self.gotoHotKeyGroup = number
+                setPosition = true
                 
             // Jump to position of hotkey group
-            elseif self.positionBeforeGoto == nil then
+            elseif self.selectMode == Commander.kSelectMode.SelectedGroup then
             
-                self.positionBeforeGoto = Vector(self:GetOrigin())
                 self:GotoHotkeyGroup(number, newPosition)
-                self.gotoHotKeyGroup = 0                
+                self:SetSelectMode(Commander.kSelectMode.JumpedToGroup)
                 setPosition = true
 
             // Jump back to our last position if hit again
             else
             
-                self:SetOrigin(self.positionBeforeGoto)
-                self.positionBeforeGoto = nil
+                self:SetOrigin(self.positionBeforeJump)
+                self:SetSelectMode(Commander.kSelectMode.SelectedGroup)
+                setPosition = true
                 
             end
-            
+                
         end
         
     end
@@ -402,6 +423,36 @@ function Commander:GetScrollPositionY()
         scrollPositionY = self.heightmap:GetMapY( self:GetOrigin().x + Commander.kViewOffsetXHeight )
     end
     return scrollPositionY
+end
+
+// For making top row the same. Marine commander overrides to set top four icons to always be identical.
+function Commander:GetTopRowTechButtons()
+    return {}
+end
+
+function Commander:GetSelectionRowsTechButtons(menuTechId)
+    return {}
+end
+
+function Commander:GetCurrentTechButtons(techId, entity)
+
+    local techButtons = {}
+
+    local topRowTechButtons = self:GetTopRowTechButtons()
+    if topRowTechButtons then
+        table.copy(topRowTechButtons, techButtons, true)
+    end
+    
+    local selectedTechButtons = entity:GetTechButtons(techId)
+    if not selectedTechButtons then
+        selectedTechButtons = self:GetSelectionRowsTechButtons(techId)
+    end
+    if selectedTechButtons then
+        table.copy(selectedTechButtons, techButtons, true)
+    end
+    
+    return techButtons
+
 end
 
 // worldX => -map y
@@ -545,5 +596,12 @@ function Commander:GetVisibleWaypoint()
     
 end
 
+function Commander:GetHostCommandStructure()
+    return Shared.GetEntity(self.commandStationId)
+end
+
+function Commander:GetCanDoDamage()
+    return false
+end
 
 Shared.LinkClassToMap( "Commander", Commander.kMapName, networkVars )

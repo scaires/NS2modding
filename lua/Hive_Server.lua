@@ -185,7 +185,7 @@ end
 
 function Hive:UpdateHealing()
 
-    if self.timeOfLastHeal == nil or Shared.GetTime() > self.timeOfLastHeal + Hive.kHealthUpdateTime then
+    if self.timeOfLastHeal == nil or Shared.GetTime() > (self.timeOfLastHeal + Hive.kHealthUpdateTime) then
         
         local players = GetGamerules():GetPlayers(self:GetTeamNumber())
         
@@ -193,13 +193,7 @@ function Hive:UpdateHealing()
         
             if player:GetIsAlive() and ((player:GetOrigin() - self:GetOrigin()):GetLength() < Hive.kHealRadius) then
             
-                local health = player:AddHealth( player:GetMaxHealth() * Hive.kHealthPercentage )
-                
-                if health > 0 then
-                
-                    player:PlaySound(Alien.kRegenerationSound)
-                    
-                end
+                player:AddHealth( player:GetMaxHealth() * Hive.kHealthPercentage, true )
             
             end
             

@@ -34,8 +34,7 @@ function Observatory:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then
     
         local techButtons = {   kTechId.Scan, kTechId.DistressBeacon, kTechId.None, kTechId.None, 
-                                kTechId.InfantryPortalTransponderTech, kTechId.None, kTechId.None, kTechId.None, 
-                                kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle }
+                                kTechId.InfantryPortalTransponderTech, kTechId.None, kTechId.Recycle, kTechId.None }
         
         return techButtons
         

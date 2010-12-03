@@ -140,7 +140,7 @@ function CommandStructure:LoginPlayer(player)
         
     end
     
-    commanderPlayer.commandStructure = self
+    commanderPlayer:SetCommandStructure(self)
     
     // Save origin so we can restore it on logout
     commanderPlayer.lastGroundOrigin = Vector(commanderStartOrigin)

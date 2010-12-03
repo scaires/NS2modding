@@ -53,6 +53,7 @@ Player.kRunIdleSpeed = 1
 
 Player.kLoginBreakingDistance = 150
 Player.kUseRange  = 1.6
+Player.kUseHolsterTime = .3
     
 Player.kGravity = -24
 Player.kMass = 90.7 // ~200 pounds (incl. armor, weapons)
@@ -279,7 +280,6 @@ function Player:OnCreate()
     self.usingStructure = nil
     self.timeOfLastUse  = nil
     self.timeOfLastWeaponSwitch = nil
-    self.commandStructure = nil
     self.respawnQueueEntryTime = nil
 
     self.timeOfDeath = nil
@@ -764,6 +764,7 @@ function Player:Use()
     
     local startPoint = self:GetViewOffset() + self:GetOrigin()
     local viewCoords = self:GetViewAngles():GetCoords()
+    local effectCoords = nil
     
     local elapsedTime = 0
     if(self.timeOfLastUse ~= nil) then
@@ -808,6 +809,10 @@ function Player:Use()
             if trace.entity:GetCanBeUsed(self) then
 
                 success = trace.entity:OnUse(self, elapsedTime, false)
+                if success then
+                    effectCoords = BuildCoords(Vector(0, 1, 0), viewCoords.zAxis)
+                    VectorCopy(trace.endPoint, effectCoords.origin)
+                end
                 
             end
 
@@ -817,17 +822,17 @@ function Player:Use()
     
     if success then
     
-        self.timeOfLastUse = Shared.GetTime()
-                
-        local weapon = self:GetActiveWeapon()
-        if(weapon ~= nil) then
-            weapon:OnHolster(self)
-        end
+        if effectCoords then
         
-        local viewModel = self:GetViewModelEntity()
-        if viewModel ~= nil then
-            viewModel:SetIsVisible(false)
+            // Play puff of sparks
+            Shared.CreateEffect(nil, MAC.kBuildEffect, nil, effectCoords)
+                
+            // Play weld/construct sound occasionally
+            Shared.PlayWorldSound(nil, MAC.kBuildSound, player, effectCoords.origin)
+            
         end
+    
+        self.timeOfLastUse = Shared.GetTime()
         
     end
     
@@ -846,6 +851,23 @@ function Player:GetCustomAnimationName(animName)
 end
 
 function Player:Buy()
+end
+
+function Player:Holster()
+
+    local success = false
+    
+    local weapon = self:GetActiveWeapon()
+    
+    if(weapon ~= nil and self:GetCanNewActivityStart()) then
+    
+        weapon:OnHolster(self)
+        success = true
+        
+    end
+    
+    return success
+
 end
 
 function Player:Draw(previousWeaponName)
@@ -912,7 +934,12 @@ function Player:GetMass()
 end
 
 function Player:AddPlasma(amount)
-    self.plasma = math.max(math.min(self.plasma + amount, kMaxResources), 0)
+    local newPlasma = math.max(math.min(self.plasma + amount, kMaxResources), 0)
+    if newPlasma ~= self.plasma then
+        self.plasma = newPlasma
+        self:SetScoreboardChanged(true)
+    end
+    
 end
 
 function Player:AddCarbon(amount)
@@ -998,6 +1025,26 @@ function Player:ComputeForwardVelocity(input)
 end
 
 function Player:UpdateEnergy(input)
+end
+
+function Player:UpdateUse(deltaTime)
+
+    if not self:GetWeaponHolstered() and (self.timeOfLastUse ~= nil) and (Shared.GetTime() - self.timeOfLastUse < Player.kUseHolsterTime) then
+
+        self:Holster()
+        
+    // Pull out weapon again if we haven't built for a bit
+    elseif(self:GetWeaponHolstered() and (self.timeOfLastUse ~= nil) and (Shared.GetTime() - self.timeOfLastUse > Player.kUseHolsterTime)) then
+    
+        self:Draw()
+        
+    end 
+
+    local viewModel = self:GetViewModelEntity()
+    if viewModel ~= nil then
+        viewModel:SetIsVisible(not self:GetWeaponHolstered())
+    end
+    
 end
 
 // Make sure we can't move faster than our max speed (esp. when holding
@@ -1356,7 +1403,7 @@ function Player:PerformMovement(offset, maxTraces, velocity)
     
 end
 
-function Player:Unstick(stuckEntity)
+function Player:Unstick()
 
     // Try moving player in a couple different directions until we're unstuck
     for index, direction in ipairs(Player.kUnstickOffsets) do
@@ -1839,6 +1886,11 @@ function Player:UpdatePoseParameters(deltaTime)
 
 end
 
+// By default the movement speed will not factor in the vertical velocity.
+function Player:GetMoveSpeedIs2D()
+    return true
+end
+
 function Player:UpdateMode()
 
     if(self.mode ~= kPlayerMode.Default and self.modeTime ~= -1 and Shared.GetTime() > self.modeTime) then
@@ -2035,7 +2087,7 @@ function Player:HandleAttacks(input)
         
     else
     
-        if(self.primaryAttackLastFrame ~= nil and self.primaryAttackLastFrame) then
+        if self.primaryAttackLastFrame then
         
             self:PrimaryAttackEnd()
             
@@ -2649,5 +2701,10 @@ function Player:Knockback(velocity)
     self.modeTime = 1.25
     
 end
+
+function Player:GetCanDoDamage()
+    return true
+end
+
 
 Shared.LinkClassToMap("Player", Player.kMapName, networkVars )

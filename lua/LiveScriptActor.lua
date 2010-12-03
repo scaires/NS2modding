@@ -5,7 +5,7 @@
 //    Created by:   Charlie Cleveland (charlie@unknownworlds.com)
 //
 // Base class for all "live" entities. They have health and/or armor, can take damage, be killed 
-// and can be given orders. Players, Drifters, MACs, MASCs, etc. Only objects of this type 
+// and can be given orders. Players, Drifters, MACs, ARCs, etc. Only objects of this type 
 // are used for selection by the Commander.
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
@@ -28,6 +28,7 @@ LiveScriptActor.kAnimFlinchBig = "flinch_big"
 // On fire sounds
 LiveScriptActor.kOnFireSmallSound = PrecacheAsset("sound/ns2.fev/common/fire_small")
 LiveScriptActor.kOnFireLargeSound = PrecacheAsset("sound/ns2.fev/common/fire_large")
+LiveScriptActor.kAlienRegenerationSound = PrecacheAsset("sound/ns2.fev/alien/common/regeneration")
 
 // Takes this much time to reduce flinch completely
 LiveScriptActor.kFlinchIntensityReduceRate = .4
@@ -249,6 +250,11 @@ function LiveScriptActor:GetCanNewActivityStart()
     if(self.activityEnd == 0 or (Shared.GetTime() > self.activityEnd)) then
         return true
     end
+    return false
+end
+
+// Used for sentries/hydras to figure out what to attack first
+function LiveScriptActor:GetCanDoDamage()
     return false
 end
 

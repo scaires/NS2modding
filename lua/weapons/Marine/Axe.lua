@@ -141,7 +141,7 @@ function Axe:DoMelee()
     // Play scraping sound depending on material
     local surface = GetSurfaceFromTrace(trace)
     if(surface ~= "") then
-        Shared.PlayWorldSound(player, string.format(Axe.kMetalScrapeMaterialSound, surface), nil, trace.endPoint)
+        Shared.PlayWorldSound(nil, string.format(Axe.kMetalScrapeMaterialSound, surface), nil, trace.endPoint)
     end
 
 end

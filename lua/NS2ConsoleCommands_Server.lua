@@ -596,6 +596,24 @@ function OnCommandGiveGameEffect(client, gameEffectString, durationString)
     
 end
 
+function OnCommandSetGameEffect(client, gameEffectString, trueFalseString)
+
+    if Shared.GetCheatsEnabled() then
+    
+        local player = client:GetControllingPlayer()          
+        local gameEffect = StringToEnum(kGameEffect, gameEffectString)
+        
+        local state = true
+        if trueFalseString and ((trueFalseString == "false") or (trueFalseString == "0")) then
+            state = false
+        end
+        
+        player:SetGameEffectMask(gameEffect, state)
+        
+    end
+    
+end
+
 function OnCommandChangeGCSettingServer(client, settingName, newValue)
 
     if Shared.GetCheatsEnabled() then
@@ -674,3 +692,4 @@ Event.Hook("Console_create",                OnCommandCreate)
 Event.Hook("Console_random_debug",          OnCommandRandomDebug)
 Event.Hook("Console_bacon",                 OnCommandDistressBeacon)
 Event.Hook("Console_givegameeffect",        OnCommandGiveGameEffect)
+Event.Hook("Console_setgameeffect",         OnCommandSetGameEffect)

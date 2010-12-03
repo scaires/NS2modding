@@ -32,6 +32,7 @@ function LiveScriptActor:OnSynchronized()
 
     ScriptActor.OnSynchronized(self)
     self:SetPoseParameters()
+    self:UpdateEffects()
     
 end
 
@@ -40,3 +41,32 @@ function LiveScriptActor:GetCustomSelectionText()
     return ""
 end
     
+function LiveScriptActor:UpdateEffects()
+
+    // Play on-fire cinematic every so often if we're on fire
+    if self:GetGameEffectMask(kGameEffect.OnFire) and self:GetIsAlive() and self:GetIsVisible() then
+    
+        // If we haven't played effect for a bit
+        local time = Shared.GetTime()
+        
+        if not self.timeOfLastFireEffect or (time > (self.timeOfLastFireEffect + .5)) then
+        
+            local firstPerson = (Client.GetLocalPlayer() == self)
+            local cinematicName = GetOnFireCinematic(self, firstPerson)
+            
+            if firstPerson then            
+                local viewModel = self:GetViewModelEntity()
+                if viewModel then
+                    Shared.CreateEffect(self, cinematicName, viewModel, Coords.GetTranslation(Vector(0, 0, 0)))
+                end
+            else
+                Shared.CreateEffect(self, cinematicName, self, self:GetAngles():GetCoords())
+            end
+            
+            self.timeOfLastFireEffect = time
+            
+        end
+        
+    end
+    
+end

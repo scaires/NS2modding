@@ -166,9 +166,15 @@ function BlendedActor:SetAnimationWithBlending(baseAnimationName, blendTime, for
 
     // If we have no animation or are already playing this animation, don't blend
     if(theCurrentAnimName ~= nil and theCurrentAnimName ~= animationName) then    
+    
         self.prevAnimationSequence = self:GetAnimationIndex(theCurrentAnimName)
         self.prevAnimationStart    = self.animationStart
         self.blendTime             = blendTime
+        
+        if self.GetClassName and self:GetClassName() == gActorAnimDebugClass then
+            Print("%s:SetAnimationWithBlending(%s, %.2f, %s, %s) (next SetAnimation is from this one)", self:GetClassName(), ToString(theCurrentAnimName), blendTime, ToString(force), ToString(speed))
+        end
+
     else
         self.prevAnimationSequence = Model.invalidSequence
         self.prevAnimationStart = 0
@@ -285,6 +291,11 @@ function BlendedActor:BuildPose(poses)
             local fraction = Clamp( (time - self.animationStart) / self.blendTime, 0, 1 )
             
             if (fraction < 1) then
+            
+                if self.GetClassName and self:GetClassName() == gActorAnimDebugClass then
+                    Print("%s:BuildPose(): fraction: %.2f", self:GetClassName(), fraction)
+                end
+                
                 self:BlendAnimation(poses, self.prevAnimationSequence, self.prevAnimationStart, 1 - fraction)
             end
             
@@ -295,6 +306,27 @@ function BlendedActor:BuildPose(poses)
     // Apply the overlay animation if we have one.
     if (self.overlayAnimationSequence ~= Model.invalidSequence) then
         self:AccumulateAnimation(poses, self.overlayAnimationSequence, self.overlayAnimationStart)
+    end
+    
+end
+
+/**
+ * Blends an animation over the existing pose by the indicated fraction (0 to 1).
+ */
+function BlendedActor:BlendAnimation(poses, animationIndex, animationStart, fraction)
+
+    local model = Shared.GetModel(self.modelIndex)
+
+    if (model ~= nil) then
+        
+        local animationTime = (Shared.GetTime() - animationStart) * self.animationSpeed
+
+        local poses2 = PosesArray()
+        model:GetReferencePose(poses2)
+        model:AccumulateSequence(animationIndex, animationTime, self.poseParams, poses2)
+
+        Model.GetBlendedPoses(poses, poses2, fraction)
+
     end
     
 end

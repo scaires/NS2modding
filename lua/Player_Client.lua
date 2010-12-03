@@ -595,7 +595,7 @@ function Player:UpdateCrossHairText()
             updatedText = true
 
         // Add quickie damage feedback and structure status
-        elseif (entity:isa("Structure") or entity:isa("MAC") or entity:isa("Drifter") or entity:isa("MASC")) and entity:GetIsAlive() then
+        elseif (entity:isa("Structure") or entity:isa("MAC") or entity:isa("Drifter") or entity:isa("ARC")) and entity:GetIsAlive() then
         
             local techId = trace.entity:GetTechId()
             local statusText = string.format("(%.0f%%)", Clamp(math.ceil(trace.entity:GetHealthScalar() * 100), 0, 100))
@@ -1543,6 +1543,8 @@ function Player:OnUpdate(deltaTime)
     
     // Need to update pose parameters every frame to keep them smooth
     LiveScriptActor.OnUpdate(self, deltaTime)
+    
+    self:UpdateUse(deltaTime)
     
     if not Client.GetIsRunningPrediction() then
     

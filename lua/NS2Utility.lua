@@ -326,6 +326,36 @@ function GetSurfaceFromTrace(trace)
     
 end
 
+// Trace line to each target to make sure it's not blocked by a wall 
+function GetWallBetween(startPoint, endPoint, ignoreEntity)
+
+    local currentStart = Vector()
+    VectorCopy(startPoint, currentStart)
+    
+    local filter = EntityFilterOne(ignoreEntity)
+
+    // Don't trace too much 
+    for i = 0, 10 do
+    
+        local trace = Shared.TraceRay(currentStart, endPoint, PhysicsMask.Bullets, filter)
+        
+        // Not blocked by entities, only world geometry
+        if trace.fraction == 1 then
+            return false
+        elseif not trace.entity then
+            return true
+        else
+            filter = EntityFilterTwo(ignoreEntity, trace.entity)
+        end
+        
+        VectorCopy(trace.endPoint, currentStart)
+        
+    end
+    
+    return false
+    
+end
+
 // Get damage type description text for tooltips
 function DamageTypeDesc(damageType)
     if table.count(kDamageTypeDesc) >= damageType then
@@ -859,7 +889,10 @@ function SetPlayerPoseParameters(player, viewAngles, velocity, maxSpeed, maxBack
     local viewCoords = viewAngles:GetCoords()
     
     local horizontalVelocity = Vector(velocity)
-    horizontalVelocity.y = 0
+    // Not all players will contrain their movement to the X/Z plane only.
+    if player:GetMoveSpeedIs2D() then
+        horizontalVelocity.y = 0
+    end
     
     local x = Math.DotProduct(viewCoords.xAxis, horizontalVelocity)
     local z = Math.DotProduct(viewCoords.zAxis, horizontalVelocity)
@@ -899,13 +932,15 @@ function GetHasRoomForCapsule(extents, position, physicsMask, ignoreEntity)
 
 end
 
-function GetOnFireCinematic(ent)
+function GetOnFireCinematic(ent, firstPerson)
 
     local className = ent:GetClassName()
     
-    if className == "Hive" or className == "CommandStation" then
+    if firstPerson then
+        return Flamethrower.kBurn1PCinematic
+    elseif className == "Hive" or className == "CommandStation" then
         return Flamethrower.kBurnHugeCinematic
-    elseif className == "MAC" or className == "Drifter" or className == "Sentry" then
+    elseif className == "MAC" or className == "Drifter" or className == "Sentry" or className == "Egg" or className == "Embryo" then
         return Flamethrower.kBurnSmallCinematic
     elseif className == "Onos" then
         return Flamethrower.kBurnBigCinematic

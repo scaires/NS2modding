@@ -67,7 +67,7 @@ Structure.kStartHealthScalar = .3
 
 Structure.kDefaultBuildTime = 8.00
 
-Structure.kBuildInterval = 0.85
+Structure.kBuildInterval = 0.65
 
 // Played when structure is first created (includes tech points)
 Structure.kAnimSpawn = "spawn"
@@ -75,7 +75,7 @@ Structure.kAnimSpawn = "spawn"
 // Played structure becomes fully built
 Structure.kAnimDeploy = "deploy"
 
-// Played when MASC, Extractor fully built 
+// Played when ARC, Extractor fully built 
 Structure.kAnimActive = "active"
 
 Structure.kAnimDeath = "death"
@@ -396,5 +396,16 @@ end
 function Structure:GetIsPowered()
     return self.powered
 end
+
+function Structure:GetEngagementPoint()
+
+    local attachPoint, success = self:GetAttachPointOrigin("target")
+    if not success then
+        return LiveScriptActor.GetEngagementPoint(self)
+    end
+    return attachPoint
+    
+end
+
 
 Shared.LinkClassToMap("Structure", Structure.kMapName, networkVars)

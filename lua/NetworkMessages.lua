@@ -74,6 +74,7 @@ local kScoresMessage =
     score = string.format("integer (0 to %d)", kMaxScore),
     kills = string.format("integer (0 to %d)", kMaxKills),
     deaths = string.format("integer (0 to %d)", kMaxDeaths),
+    plasma = string.format("integer (0 to %d)", kMaxResources),
     isCommander = "boolean"
 }
 
@@ -87,6 +88,7 @@ function BuildScoresMessage(player)
     t.score = player:GetScore()
     t.kills = player:GetKills()
     t.deaths = player:GetDeaths()
+    t.plasma = player:GetPlasma()
     t.isCommander = player:isa("Commander")
     
     return t

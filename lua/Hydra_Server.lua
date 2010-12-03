@@ -162,7 +162,7 @@ function Hydra:OnThink()
 
         else
         
-            // Play alert animation if marines nearby and we're not targeting (MASCs?)
+            // Play alert animation if marines nearby and we're not targeting (ARCs?)
             if self.timeLastAlertCheck == nil or Shared.GetTime() > self.timeLastAlertCheck + Hydra.kAlertCheckInterval then
             
                 if self:GetIsEnemyNearby() then

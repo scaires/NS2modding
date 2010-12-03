@@ -81,21 +81,6 @@ function AlienTeam:Update(timePassed)
     
 end
 
-function AlienTeam:PerformAutoHeal()
-
-    for index, structure in ipairs(self.structures) do
-    
-        // Auto-heal structures too
-        if structure:GetHealth() < structure:GetMaxHealth() then
-        
-            structure:AddHealth(AlienTeam.kAutoHealRate)
-            
-        end
- 
-    end
-
-end
-
 function AlienTeam:UpdateAutoBuild(timePassed)
 
     PROFILE("AlienTeam:UpdateTeamAutoBuild")
@@ -132,13 +117,25 @@ function AlienTeam:UpdateTeamAutoHeal(timePassed)
         
             if player:GetIsAlive() then
             
-                player:AddHealth( player:GetMaxHealth() * AlienTeam.kAutoHealPercent )
+                // Players always get at least 1 point back
+                local healthBack = math.max(player:GetMaxHealth() * AlienTeam.kAutoHealPercent, 1)
+                player:AddHealth(healthBack, true)
                 
             end
             
         end
         
         self.timeOfLastAutoHeal = time
+        
+    end
+    
+    // Auto-heal structures constantly
+    for index, structure in ipairs(self.structures) do
+    
+        // Cap it so eggs don't count up like 1-2% per second
+        local maxHealth = structure:GetMaxHealth() * kBalanceAutoHealMaxPercentPerSecond/100 * timePassed
+        local health = math.min(AlienTeam.kAutoHealRate * timePassed, maxHealth)
+        structure:AddHealth(health, false)
         
     end
     

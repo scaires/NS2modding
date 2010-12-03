@@ -127,6 +127,10 @@ function MAC:GetExtents()
     return Vector(MAC.kCapsuleRadius, MAC.kCapsuleHeight/2, MAC.kCapsuleRadius)
 end
 
+function MAC:GetFov()
+    return 120
+end
+
 function MAC:GetIsFlying()
     return true
 end
@@ -233,6 +237,11 @@ function MAC:SetOrder(order, clearExisting, insertFirst)
         self:PlayChatSound(MAC.kStartConstructionSoundName)        
     else
         self:PlayChatSound(MAC.kConfirmSoundName)
+    end
+    
+    local owner = self:GetOwner()
+    if owner then
+        Server.PlayPrivateSound(owner, MAC.kConfirm2DSoundName, owner, 1.0, Vector(0, 0, 0))
     end
     
     self:PlaySound(MAC.kThrustersSoundName)
@@ -531,7 +540,7 @@ function MAC:ProcessBuildConstruct()
             if constructTarget then
             
                 // Otherwise, add build time to structure
-                constructTarget:Construct(MAC.kConstructThinkInterval)
+                constructTarget:Construct(MAC.kConstructThinkInterval * kMACConstructEfficacy)
                 
                 // Play puff of sparks
                 self:CreateAttachedEffect(MAC.kBuildEffect, "fxnode_welder")
@@ -686,14 +695,9 @@ end
 function MAC:GetTechButtons(techId)
 
     if(techId == kTechId.RootMenu) then return 
-        {   kTechId.BuildMenu, kTechId.None, kTechId.None, kTechId.None, 
-            kTechId.Move, kTechId.Attack, kTechId.Stop, kTechId.Weld,
-            kTechId.MACMine, kTechId.MACEMP, kTechId.None, kTechId.None
-            }
-    elseif(techId == kTechId.BuildMenu) then return 
-        {   kTechId.CommandStation, kTechId.Extractor, kTechId.InfantryPortal, kTechId.Armory, 
-            kTechId.Sentry, kTechId.Observatory, kTechId.RoboticsFactory, kTechId.None,
-            kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu}
+            {   kTechId.Attack, kTechId.Stop, kTechId.Move, kTechId.Weld,
+                kTechId.MACMine, kTechId.MACEMP, kTechId.None, kTechId.None }
+
     else return nil end
     
 end

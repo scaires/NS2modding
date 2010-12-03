@@ -43,8 +43,7 @@ kDefaultPlayerName = "NsPlayer"
 kDefaultWaypointGroup = "GroundWaypoints"
 kAirWaypointsGroup = "AirWaypoints"
 
-// The maximum number of animations in a .model
-kMaxResources = 10000
+kMaxResources = 999
 
 // Max number of entities allowed in radius. Don't allow creating any more entities if this number is rearched.
 // Don't include players in count.
@@ -79,6 +78,7 @@ kSpecialEditionProductId = 4930
 
 // Allow players to fire before animation finishes, feels too sluggish otherwise (marine weapons)
 kMarineDrawSpeedScalar = 1.25
+kSkulkBiteSpeedScalar = 1.25
 
 // Damage types 
 // 
@@ -93,7 +93,7 @@ kMarineDrawSpeedScalar = 1.25
 // Structural - Double against structures (Gore, Axe, GL)
 // Gas - Breathing targets only (Spores, Nerve Gas GL)
 // Biological - Living targets only (Parasite, Flamethrower, Healing spray)
-// StructuresOnly - Doesn't damage players or AI units (MASC, Bombard, Sap)
+// StructuresOnly - Doesn't damage players or AI units (ARC, Bombard, Sap)
 // Falling - Ignores armor for humans, no damage for some creatures or exoskeleton
 // Door - Like Normal but also does damage to Doors. Nothing else damages Doors.
 // Flame - Like normal but catches target on fire and plays special flinch animation
@@ -114,7 +114,7 @@ kDamageTypeDesc = {
 }
 
 // Death message indices 
-kDeathMessageIcon = enum( {'None', 'Rifle', 'RifleButt', 'Pistol', 'Axe', 'Shotgun', 'Flamethrower', 'MASC', 'Grenade', 'Sentry', 'MAC', 'Bite', 'HydraSpike', 'Spray', 'Spikes', 'SpikesAlt', 'Spray', 'SwipeBlink', 'Drifter', 'Whip'} )
+kDeathMessageIcon = enum( {'None', 'Rifle', 'RifleButt', 'Pistol', 'Axe', 'Shotgun', 'Flamethrower', 'ARC', 'Grenade', 'Sentry', 'MAC', 'Bite', 'HydraSpike', 'Spray', 'Spikes', 'SpikesAlt', 'Spray', 'SwipeBlink', 'Drifter', 'Whip'} )
 
 // 0 = tech/resource point (empty white square)
 // 1 = structure (filled in square, smaller than tech point)
@@ -143,6 +143,7 @@ kEnergizeGameEffect = "energize"
 kMaxStackLevel = 10
 
 kMaxEntityStringLength = 32
+kMaxAnimationStringLength = 32
 
 // Player modes. When outside the default player mode, input isn't processed from the player
 kPlayerMode = enum( {'Default', 'Taunt', 'Knockback', 'StandUp', 'GorgeStructure', 'GorgeStartArmor', 'GorgeArmor', 'GorgeEndArmor', 'GorgeStartSlide', 'GorgeSliding', 'GorgeEndSlide', 'GorgeDeath', 'FadeBlinkIn', 'FadeStab', 'OnosStartJump'} )
@@ -163,7 +164,7 @@ kBlockAttachStructuresRadius = 3
 kHighestPriorityZ = 3
 
 // How often to send kills, deaths, nick name changes, etc. for scoreboard
-kScoreboardUpdateInterval = .5
+kScoreboardUpdateInterval = 1
 
 // How often to send ping updates
 kUpdatePingsInterval = 1.25

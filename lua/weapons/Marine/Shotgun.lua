@@ -230,7 +230,9 @@ function Shotgun:EnterReloadPhase(player, phase)
     
     self.reloadPhaseEnd = Shared.GetTime() + time
     
-    Shared.PlaySound(player, soundName)
+    if soundName ~= "" then
+        Shared.PlaySound(player, soundName)
+    end
     
     if(blockActivity) then
     

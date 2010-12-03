@@ -287,9 +287,17 @@ function RadiusDamage(entities, centerOrigin, radius, fullDamage, attacker)
         local damageScalar = 1 - math.min(math.max(0, distanceFromTarget/radius), 1)
         local damage = fullDamage*damageScalar
         
-        //Print("RadiusDamage - %s:TakeDamage: %s, %s (dist: %.2f, damageScalar: %.2f, damage: %.2f)", target:GetMapName(), attacker:GetMapName(), tostring(damage), distanceFromTarget, damageScalar, damage)
+        // Trace line to each target to make sure it's not blocked by a wall 
+        local targetOrigin = target:GetModelOrigin()
+        if target.GetEngagementPoint then
+            targetOrigin = target:GetEngagementPoint()
+        end
         
-        target:TakeDamage(damage, attacker, attacker, target:GetOrigin(), damageDirection)
+        if not GetWallBetween(centerOrigin, targetOrigin, attacker) then
+        
+            target:TakeDamage(damage, attacker, attacker, target:GetOrigin(), damageDirection)
+
+        end
         
     end
     

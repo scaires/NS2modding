@@ -115,7 +115,7 @@ function GrenadeLauncher:OnSecondaryAttack(player)
         player:SetActivityEnd(self:GetSecondaryAttackDelay() * player:GetCatalystFireModifier())
 
         // Play the fire animation on the character.
-        player:SetOverlayAnimation(Marine.kAnimOverlayFire)
+        player:SetOverlayAnimation("attack_grenade")
         
         Shared.PlaySound(player, GrenadeLauncher.kFireSoundName)
         
@@ -126,9 +126,18 @@ function GrenadeLauncher:OnSecondaryAttack(player)
         
             local viewAngles = player:GetViewAngles()
             local viewCoords = viewAngles:GetCoords()
-            // The eye position just barely sticks out past some walls so we
-            // need to move the emit point back a tiny bit to compensate.
-            local startPoint = player:GetEyePos() - (viewCoords.zAxis * 0.2)
+            
+            // Make sure start point isn't on the other side of a wall or object
+            local startPoint = player:GetEyePos() + viewCoords.zAxis * .5 - viewCoords.xAxis * .3 - viewCoords.yAxis * .25
+            local trace = Shared.TraceRay(player:GetEyePos(), startPoint, PhysicsMask.Bullets, EntityFilterOne(player))
+            
+            if trace.fraction ~= 1 then
+            
+                // The eye position just barely sticks out past some walls so we
+                // need to move the emit point back a tiny bit to compensate.
+                VectorCopy(player:GetEyePos() - (viewCoords.zAxis * 0.2), startPoint)
+                
+            end
             
             local grenade = CreateEntity(Grenade.kMapName, startPoint, player:GetTeamNumber())
             SetAnglesFromVector(grenade, viewCoords.zAxis)
@@ -176,7 +185,7 @@ function GrenadeLauncher:ReloadGrenade(player)
     if (self.auxClip < GrenadeLauncher.kAuxClipSize) and (self.auxAmmo > 0) and player:GetCanNewActivityStart() then
         
         // Play the reload sequence and don't let it be interrupted until it finishes playing.
-        local length = player:SetViewAnimation(GrenadeLauncher.kAnimReloadGrenade)
+        local length = player:SetViewAnimation(GrenadeLauncher.kAnimReloadGrenade, false, true)
         player:SetActivityEnd(length)
         
         Shared.PlaySound(player, GrenadeLauncher.kReloadSoundName)

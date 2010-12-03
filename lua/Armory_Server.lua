@@ -180,11 +180,6 @@ function Armory:OnResearch(researchId)
         // Create visual add-on for module
         self:AddChildModel(Armory.kWeaponsModuleChildModel)
 
-    elseif(researchId == kTechId.PrototypeModule) then
-    
-        // Create visual add-on for module
-        self:AddChildModel(Armory.kPrototypeModuleChildModel)
-
     end
     
 end
@@ -205,10 +200,6 @@ function Armory:OnResearchComplete(structure, researchId)
         
             success = self:SetTechId(kTechId.WeaponsModule)
     
-        elseif(researchId == kTechId.PrototypeModule) then
-        
-            success = self:SetTechId(kTechId.PrototypeModule)
-            
         end
         
     end
@@ -216,8 +207,6 @@ function Armory:OnResearchComplete(structure, researchId)
     return success    
     
 end
-
-
 
 // Check if friendly players are nearby and facing armory and heal/resupply them
 function Armory:OnThink()
@@ -246,13 +235,17 @@ function Armory:UpdateLoggedIn()
         
         local newState = false
         
-        for playerIndex, player in ipairs(players) do
+        if self:GetIsBuilt() and self:GetIsActive() then
         
-            // See if player is nearby
-            if (player:GetModelOrigin() - (self:GetModelOrigin() + indexToUseOrigin[i])):GetLength() < Armory.kResupplyUseRange then
+            for playerIndex, player in ipairs(players) do
             
-                newState = true
-                break
+                // See if player is nearby
+                if (player:GetModelOrigin() - (self:GetModelOrigin() + indexToUseOrigin[i])):GetLength() < Armory.kResupplyUseRange then
+                
+                    newState = true
+                    break
+                    
+                end
                 
             end
             

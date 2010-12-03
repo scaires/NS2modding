@@ -112,6 +112,10 @@ function Drifter:GetTechId()
     return kTechId.Drifter
 end
 
+function Drifter:GetFov()
+    return 120
+end
+
 function Drifter:GetDeathIconIndex()
     return kDeathMessageIcon.Drifter
 end
@@ -123,6 +127,11 @@ function Drifter:SetOrder(order, clearExisting, insertFirst)
     self:SetNextThink(Drifter.kMoveThinkInterval)
     
     self:PlaySound(Drifter.kOrderedSoundName)
+    
+    local owner = self:GetOwner()
+    if owner then
+        Server.PlayPrivateSound(owner, Drifter.kOrdered2DSoundName, owner, 1.0, Vector(0, 0, 0))
+    end
         
 end
 

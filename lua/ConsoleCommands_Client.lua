@@ -35,7 +35,7 @@ function OnCommandOnClientDisconnect(clientIndexString)
 end
 
 function OnCommandScores(scoreTable)
-    Scoreboard_SetPlayerData(scoreTable.clientId, scoreTable.playerName, scoreTable.teamNumber, scoreTable.score, scoreTable.kills, scoreTable.deaths, scoreTable.isCommander)
+    Scoreboard_SetPlayerData(scoreTable.clientId, scoreTable.playerName, scoreTable.teamNumber, scoreTable.score, scoreTable.kills, scoreTable.deaths, scoreTable.plasma, scoreTable.isCommander)
 end
 
 // Notify scoreboard and anything else when a player changes into a new player
@@ -102,6 +102,20 @@ function OnCommandResetMouse()
     Client.SetPitch(0)
 end
 
+function OnCommandAnimDebug(className)
+
+    // Messages printed by server
+    if Shared.GetDevMode() then
+    
+        if className then
+            gActorAnimDebugClass = className
+        elseif gActorAnimDebugClass ~= "" then
+            gActorAnimDebugClass = ""
+        end
+    end
+    
+end
+
 Event.Hook("Console_tooltip",                   OnCommandTooltip)
 Event.Hook("Console_reset",                     OnCommandRoundReset)
 Event.Hook("Console_deathmsg",                  OnCommandDeathMsg)
@@ -111,6 +125,7 @@ Event.Hook("Console_points",                    OnCommandPoints)
 Event.Hook("Console_harvestercount",            OnCommandTeamHarvesterCount)
 Event.Hook("Console_soundgeometry",             OnCommandSoundGeometry)
 Event.Hook("Console_reloadsoundgeometry",       OnCommandReloadSoundGeometry)
+Event.Hook("Console_onanimdebug",               OnCommandAnimDebug)
 
 Client.HookNetworkMessage("Ping",               OnCommandPing)
 Client.HookNetworkMessage("Scores",             OnCommandScores)
@@ -121,3 +136,4 @@ Client.HookNetworkMessage("TechNodeBase",       OnCommandTechNodeBase)
 Client.HookNetworkMessage("TechNodeUpdate",     OnCommandTechNodeUpdate)
 
 Client.HookNetworkMessage("ResetMouse",         OnCommandResetMouse)
+

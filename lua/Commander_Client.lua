@@ -192,7 +192,8 @@ function CommanderUI_MenuButtonRequiresTarget(index)
         
         if(techNode ~= nil) then
         
-            requiresTarget = techNode:GetRequiresTarget()
+            // Buy nodes require a target for the commander
+            requiresTarget = techNode:GetRequiresTarget() or techNode:GetIsBuy()
             
         end
         
@@ -1091,7 +1092,7 @@ function Commander:GetCircleSizeForEntity(entity)
     size = ConditionalValue(entity:isa("Armory"), 3.5, size)
     size = ConditionalValue(entity:isa("Harvester"), 3.2, size)
     size = ConditionalValue(entity:isa("RoboticsFactory"), 3.8, size)
-    size = ConditionalValue(entity:isa("MASC"), 3, size)
+    size = ConditionalValue(entity:isa("ARC"), 3, size)
     return size
     
 end

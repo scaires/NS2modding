@@ -203,8 +203,7 @@ function Door:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then   
     
         return  {   kTechId.DoorOpen, kTechId.DoorClose, kTechId.None, kTechId.None,
-                    kTechId.DoorLock, kTechId.DoorUnlock, kTechId.None, kTechId.None,
-                    kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+                    kTechId.DoorLock, kTechId.DoorUnlock, kTechId.None, kTechId.None }
                     
     end
     

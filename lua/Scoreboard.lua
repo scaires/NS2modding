@@ -15,7 +15,8 @@ kScoreboardDataIndexScore = 4
 kScoreboardDataIndexKills = 5
 kScoreboardDataIndexDeaths = 6
 kScoreboardDataIndexIsCommander = 7
-kScoreboardDataIndexPing = 8
+kScoreboardDataIndexPlasma = 8
+kScoreboardDataIndexPing = 9
 
 function Scoreboard_Clear()
 
@@ -36,6 +37,7 @@ function Scoreboard_OnResetGame()
         playerRecord[kScoreboardDataIndexKills] = 0
         playerRecord[kScoreboardDataIndexDeaths] = 0
         playerRecord[kScoreboardDataIndexIsCommander] = false
+        playerRecord[kScoreboardDataIndexPlasma] = 0
         
     end 
 
@@ -62,7 +64,7 @@ function Scoreboard_OnClientDisconnect(clientIndex)
     
 end
 
-function Scoreboard_SetPlayerData(clientIndex, playerName, teamNumber, score, kills, deaths, isCommander)
+function Scoreboard_SetPlayerData(clientIndex, playerName, teamNumber, score, kills, deaths, plasma, isCommander)
     
     // Lookup record for player and update it
     for i = 1, table.maxn(playerData) do
@@ -78,6 +80,7 @@ function Scoreboard_SetPlayerData(clientIndex, playerName, teamNumber, score, ki
             playerRecord[kScoreboardDataIndexKills] = kills
             playerRecord[kScoreboardDataIndexDeaths] = deaths
             playerRecord[kScoreboardDataIndexIsCommander] = isCommander
+            playerRecord[kScoreboardDataIndexPlasma] = plasma
             
             return
             
@@ -94,6 +97,7 @@ function Scoreboard_SetPlayerData(clientIndex, playerName, teamNumber, score, ki
     playerRecord[kScoreboardDataIndexKills] = kills
     playerRecord[kScoreboardDataIndexDeaths] = deaths
     playerRecord[kScoreboardDataIndexIsCommander] = isCommander
+    playerRecord[kScoreboardDataIndexPlasma] = 0
     playerRecord[kScoreboardDataIndexPing] = 0
     
     table.insert(playerData, playerRecord )
@@ -185,6 +189,7 @@ function GetScoreData(teamNumberTable)
             table.insert(scoreData, playerRecord[kScoreboardDataIndexKills])
             table.insert(scoreData, playerRecord[kScoreboardDataIndexDeaths])
             table.insert(scoreData, playerRecord[kScoreboardDataIndexIsCommander])
+            table.insert(scoreData, playerRecord[kScoreboardDataIndexPlasma])
             table.insert(scoreData, playerRecord[kScoreboardDataIndexPing])
             
         end

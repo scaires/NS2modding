@@ -718,9 +718,8 @@ function Marine:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then 
 
         // Show orders     
-        techButtons = { kTechId.SquadSeekAndDestroy, kTechId.SquadHarass, kTechId.SquadRegroup, kTechId.None,
-                        kTechId.SquadMove, kTechId.SquadAttack, kTechId.SquadDefend, kTechId.None,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.None}
+        techButtons = { kTechId.SquadAttack, kTechId.SquadMove, kTechId.SquadDefend, kTechId.None,
+                        kTechId.SquadSeekAndDestroy, kTechId.SquadHarass, kTechId.SquadRegroup, kTechId.None }
         
     end
     

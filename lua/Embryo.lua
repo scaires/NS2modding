@@ -146,4 +146,8 @@ if Server then
     
 end
 
+function Embryo:GetCanDoDamage()
+    return false
+end
+
 Shared.LinkClassToMap("Embryo", Embryo.kMapName, networkVars)

@@ -36,7 +36,7 @@ Crag.kHealRadius = 10
 Crag.kHealAmount = 10
 Crag.kMaxTargets = 3
 Crag.kThinkInterval = .25
-Crag.kHealInterval = 1.0
+Crag.kHealInterval = 2.0
 Crag.kUmbraDuration = 8
 Crag.kUmbraRadius = 5
 
@@ -80,8 +80,13 @@ function Crag:GetSortedTargetList()
         if (entity:GetHealth() < entity:GetMaxHealth()) or (entity:GetArmor() < entity:GetMaxArmor()) then
         
             if (not entity:isa("Structure") or entity:GetIsBuilt()) or (not entity:isa("Embryo")) then
+            
+                // Crags don't heal self
+                if entity ~= self then
         
-                table.insert(targets, entity)
+                    table.insert(targets, entity)
+                    
+                end
                 
             end
             
@@ -91,6 +96,8 @@ function Crag:GetSortedTargetList()
     
     // The comparison function must return a boolean value specifying whether the first argument should 
     // be before the second argument in the sequence (he default behavior is <).
+    // All table.sort functions need to be deterministic.
+    // For example, if ent1 < ent2 than later the same ent2 cannot be < ent1.
     function sortCragTargets(ent1, ent2)
     
         // Heal players before structures
@@ -108,7 +115,8 @@ function Crag:GetSortedTargetList()
         end
         
         // Heal most hurt entities first (looks at total percentage of health)
-        if ent1:GetHealthScalar() <= ent2:GetHealthScalar() then
+        // ent2 ~= self is required so this function is deterministic.
+        if ent2 ~= self and ent1:GetHealthScalar() <= ent2:GetHealthScalar() then
             return true
         end
                 

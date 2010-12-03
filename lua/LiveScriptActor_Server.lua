@@ -105,7 +105,7 @@ function LiveScriptActor:TakeDamage(damage, attacker, doer, point, direction)
 end
 
 // Return the amount of health we added 
-function LiveScriptActor:AddHealth(health)
+function LiveScriptActor:AddHealth(health, playSound)
 
     local total = 0
     
@@ -121,6 +121,10 @@ function LiveScriptActor:AddHealth(health)
         end
         
         total = healthAdded + healthToAddToArmor
+        
+        if total > 0 and playSound and (self:GetTeamType() == kAlienTeamType) then
+            self:PlaySound(LiveScriptActor.kAlienRegenerationSound)
+        end
         
     end
     
@@ -346,11 +350,12 @@ function LiveScriptActor:ComputeDamage(damage, damageType)
         local absorbPercentage = self:GetArmorAbsorbPercentage(damageType)
         
         // Each point of armor blocks a point of health but is only destroyed at half that rate (like NS1)
-        armorPointsUsed = math.min(self.armor, absorbPercentage * damage ) / self:GetHealthPerArmor(damageType)
+        healthPointsBlocked = math.min(self.armor, absorbPercentage * damage )
+        armorPointsUsed = healthPointsBlocked / self:GetHealthPerArmor(damageType)
         
         // Anything left over comes off of health
-        healthPointsUsed = damage - armorPointsUsed
-        
+        healthPointsUsed = damage - healthPointsBlocked   
+     
     end
     
     return damage, armorPointsUsed, healthPointsUsed
@@ -869,8 +874,6 @@ function LiveScriptActor:SetOnFire(attacker, doer)
     
     self.fireAttackerId = attacker:GetId()
     self.fireDoerId = doer:GetId()
-    
-    Shared.CreateEffect(nil, GetOnFireCinematic(self), self, Coords.GetIdentity())
     
 end
 

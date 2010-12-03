@@ -23,10 +23,12 @@ function MedPack:OnTouch(player)
 
     if( player:GetTeamNumber() == self:GetTeamNumber() ) then
     
-        // If player has less than full health
-        if( (player:GetHealth() < player:GetMaxHealth()) or (player:GetArmor() < player:GetMaxArmor()) ) then
+        // If player has less than full health or is parasited
+        if( (player:GetHealth() < player:GetMaxHealth()) or (player:GetArmor() < player:GetMaxArmor()) or player:GetGameEffectMask(kGameEffect.Parasite) ) then
 
             player:AddHealth(MedPack.kHealth)
+            
+            player:SetGameEffectMask(kGameEffect.Parasite, false)
             
             player:PlaySound(MedPack.kHealthSound)
             

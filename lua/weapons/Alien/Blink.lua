@@ -32,7 +32,7 @@ Blink.kBlinkPreviewEffect = PrecacheAsset("cinematics/alien/fade/blink_preview.c
 Blink.kSecondaryAttackDelay = 0
 Blink.kBlinkEnergyCost = 25
 Blink.kBlinkDistance = 20
-Blink.kOrientationScanRadius = 10
+Blink.kOrientationScanRadius = 2.5
 
 local networkVars = {
     showingGhost        = "boolean",
@@ -113,7 +113,9 @@ function Blink:GetBlinkOrientation(player, origin)
     
         // Face towards model origin    
         local targetFacingOrigin = Vector(ents[1]:GetModelOrigin())        
-        VectorCopy(GetNormalizedVector(ents[1]:GetModelOrigin() - origin), fadeFacing)
+        local toVector = ents[1]:GetModelOrigin() - origin
+        toVector.y = 0        
+        VectorCopy(GetNormalizedVector(toVector), fadeFacing)
             
     end    
 
@@ -144,6 +146,7 @@ function Blink:PerformBacktrace(player, startPos, endPos, endPosDiffStep, maxTra
     
 end
 
+// Controls placement of the fade "ghost" when blinking
 function Blink:GetBlinkPosition(player)
     
     local playerViewDirection = player:GetViewAngles():GetCoords().zAxis

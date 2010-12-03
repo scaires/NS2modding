@@ -24,12 +24,12 @@ kArmoryCost = 10
 kAmmoPackCost = 1    
 kMedPackCost = 2    
     
-kAdvancedArmoryUpgradeCost = 10    
+kAdvancedArmoryUpgradeCost = 15    
     
 kWeaponsModuleAddonCost = 20    
-kPrototypeModuleAddonCost = 40    
+kPrototypeLabCost = 40    
     
-kSentryCost = 5    
+kSentryCost = 20    
 kSentryTechCost = 5    
     
 kMACMineCost = 5    
@@ -38,7 +38,7 @@ kTechEMPResearchCost = 10
 kTechMACSpeedResearchCost = 5    
     
 kShotgunCost = 25    
-kShotgunTechResearchCost = 10    
+kShotgunTechResearchCost = 15    
     
 kGrenadeLauncherCost = 30    
 kGrenadeLauncherTechResearchCost = 15    
@@ -48,9 +48,9 @@ kFlamethrowerCost = 30
 kFlamethrowerTechResearchCost = 20    
     
 kRoboticsFactoryCost = 20    
-kMASCCost = 25    
-kMASCSplashTechResearchCost = 15    
-kMASCArmorTechResearchCost = 15    
+kARCCost = 25    
+kARCSplashTechResearchCost = 15    
+kARCArmorTechResearchCost = 15    
     
 kJetpackCost = 25    
 kJetpackTechResearchCost = 25    
@@ -81,7 +81,6 @@ kRifleUpgradeTechResearchCost = 10
 kObservatoryCost = 10    
 kPhaseTechResearchCost = 10    
     
-kReplicateTechCost = 10    
     
     
 kHiveCost = 20    
@@ -110,7 +109,7 @@ kGorgeCost = 10
 kLerkCost = 30    
 kFadeCost = 50    
 kOnosCost = 75    
-kHydraCost = 5    
+kHydraCost = 10
     
 kLeapResearchCost = 5    
 kBloodThirstResearchCost = 5    
@@ -145,11 +144,12 @@ kStompCost = 2
 kBoneShieldCost = 2    
     
     
-kPlayingTeamInitialCarbon = 100    
+kPlayingTeamInitialCarbon = 50    
     
-kPlayerInitialPlasma = 25    
+kPlayerInitialPlasma = 10    
     
 kResourceTowerResourceInterval = 6    
+    
     
     
 // MARINE DAMAGE    
@@ -178,25 +178,27 @@ kAxeDamageType = kDamageType.Structural
 kAxeFireDelay = 0.6    
     
     
-kGrenadeLauncherDamage = 300    
-kGrenadeLauncherDamageType = kDamageType.Normal    
+kGrenadeLauncherDamage = 150    
+kGrenadeLauncherDamageType = kDamageType.Structural    
 kGrenadeLauncherFireDelay = 1    
 kGrenadeLauncherClipSize = 4    
+kGrenadeLauncherDamageRadius = 8    
+kGrenadeLifetime = 3    
     
 kShotgunMaxDamage = 20    
 kShotgunMinDamage = 14    
 kShotgunDamageType = kDamageType.Normal    
 kShotgunFireDelay = 0.9    
-kShotgunClipSize = 6    
+kShotgunClipSize = 8    
 kShotgunBulletsPerShot = 10    
 kShotgunMinDamageRange = 20    
 kShotgunMaxDamageRange = 2    
 kShotgunSpreadDegrees = 20    
     
-kFlamethrowerDamage = 50    
+kFlamethrowerDamage = 35    
 kFlamethrowerDamageType = kDamageType.Flame    
 kFlamethrowerFireDelay = 0.5    
-kFlamethrowerClipSize = 25    
+kFlamethrowerClipSize = 20    
     
 kBurnDamagePerSecond = 10    
     
@@ -210,15 +212,15 @@ kMACAttackDamageType = kDamageType.Normal
 kMACAttackFireDelay = 0.6    
     
     
-kSentryAttackDamage = 20    
-kSentryAttackDamageType = kDamageType.Light    
-kSentryAttackBaseROF = 0.175
-kSentryAttackRandROF = 0.05
+kSentryAttackDamage = 10
+kSentryAttackDamageType = kDamageType.Light
+kSentryAttackBaseROF = 0.08
+kSentryAttackRandROF = 0.04
 kSentryAttackBulletsPerSalvo = 1
     
-kMASCDamage = 300    
-kMASCDamageType = kDamageType.StructuresOnly    
-kMASCFireDelay = 6    
+kARCDamage = 300    
+kARCDamageType = kDamageType.StructuresOnly    
+kARCFireDelay = 6    
     
     
 kWeapons1DamageScalar = 1.1    
@@ -229,12 +231,12 @@ kWeapons3DamageScalar = 1.3
 // ALIEN DAMAGE    
 kBiteDamage = 75    
 kBiteDamageType = kDamageType.Normal    
-kBiteFireDelay = 0.35    
+kBiteFireDelay = 0.45    
 kBiteEnergyCost = 3    
     
 kParasiteDamage = 10    
 kParasiteDamageType = kDamageType.Normal    
-kParasiteFireDelay = 0.5
+kParasiteFireDelay = 0.5    
 kParasiteEnergyCost = 30    
     
 kSpitDamage = 25    
@@ -269,10 +271,10 @@ kSwipeDamageType = kDamageType.Normal
 kSwipeFireDelay = 0.5    
 kSwipeEnergyCost = 6    
     
-kStabDamage = 150    
+kStabDamage = 160    
 kStabDamageType = kDamageType.Puncture    
-kStabFireDelay = 1.5
-kStabEnergyCost = 20
+kStabFireDelay = 1.5    
+kStabEnergyCost = 20    
     
 kGoreDamage = 90    
 kGoreDamageType = kDamageType.Normal    
@@ -303,7 +305,7 @@ kMelee3DamageScalar = 1.3
 kArmoryBuildTime = 15    
 kAdvancedArmoryResearchTime = 120    
 kWeaponsModuleAddonTime = 120    
-kPrototypeModuleAddonTime = 120    
+kPrototypeLabBuildTime = 120    
     
 kMACBuildTime = 5    
 kExtractorBuildTime = 30    
@@ -328,12 +330,12 @@ kCommandCenterUpgradeTime = 180
 kPowerPointBuildTime = 15    
     
 kRoboticsFactoryBuildTime = 50    
-kMASCBuildTime = 20    
-kMASCSplashTechResearchTime = 30    
-kMASCArmorTechResearchTime = 30    
+kARCBuildTime = 20    
+kARCSplashTechResearchTime = 30    
+kARCArmorTechResearchTime = 30    
     
 kSentryTechResearchTime = 15    
-kSentryBuildTime = 7    
+kSentryBuildTime = 15    
     
 kTechMinesResearchTime = 20    
 kTechEMPResearchTime = 20    
@@ -373,17 +375,17 @@ kHarvesterBuildTime = 30
     
 kDrifterFlareTechResearchTime = 25    
     
-kCragBuildTime = 15    
-kMatureCragBuildTime = 15    
+kCragBuildTime = 20    
+kMatureCragBuildTime = 20    
     
-kWhipBuildTime = 15    
-kMatureWhipBuildTime = 15    
+kWhipBuildTime = 20    
+kMatureWhipBuildTime = 20    
     
-kShiftBuildTime = 15    
-kMatureShiftBuildTime = 15    
+kShiftBuildTime = 20    
+kMatureShiftBuildTime = 20    
     
-kShadeBuildTime = 15    
-kMatureShadeBuildTime = 15    
+kShadeBuildTime = 20    
+kMatureShadeBuildTime = 20    
     
 kHydraBuildTime = 12    
     
@@ -427,16 +429,6 @@ kCommandCenterNanoGridCost = 50
     
 kMACCost = 50      
     
-kReplicateCommandStationCost = 125      
-kReplicateArmoryCost = 50      
-kReplicateInfantryPortalCost = 75      
-kReplicateArmoryCost = 50      
-kReplicateSentryCost = 25      
-kReplicateObservatoryCost = 50      
-kReplicateRoboticsFactoryCost = 75      
-kReplicateMACCost = 50      
-kReplicateMASCCost = 75      
-    
 kHiveInitialEnergy = 100  kHiveMaxEnergy = 200    
 kHiveMassMaxEnergy = 250    
 kHiveColonyMaxEnergy = 300    
@@ -473,5 +465,15 @@ kShadePhantasmCost = 75
 kMatureShadeMaxEnergy = 150    
     
 kEnergyUpdateRate = 0.5    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     

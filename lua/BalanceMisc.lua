@@ -8,7 +8,9 @@
 
 // Time spawning alien player must be in egg before hatching
 kAlienSpawnTime = 2
-kInitialMACs = 2
+kInitialMACs = 0
+// Construct at a slower rate than players
+kMACConstructEfficacy = .3
 kFireCatchDistance = 2
 kStopFireProbability = .15       // 15% chance per second
 kFlamethrowerAltTechResearchCost = 20
@@ -43,7 +45,7 @@ kArmoryEngagementDistance = 3
 kExtractorEngagementDistance = 2
 kObservatoryEngagementDistance = 1
 kRoboticsFactorEngagementDistance = 5
-kMASCEngagementDistance = 2
+kARCEngagementDistance = 2
 kSentryEngagementDistance = 2
 kPlayerEngagementDistance = 1
 kHeavyEngagementDistance = 1.5

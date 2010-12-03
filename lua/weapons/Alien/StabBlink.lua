@@ -99,7 +99,7 @@ function StabBlink:OnThink()
                     // Play special stab hit sound depending on material
                     local surface = GetSurfaceFromTrace(trace)
                     if(surface ~= "") then
-                        Shared.PlayWorldSound(self:GetParent(), string.format(StabBlink.kScrapeMaterialSound, surface), nil, trace.endPoint)
+                        Shared.PlayWorldSound(nil, string.format(StabBlink.kScrapeMaterialSound, surface), nil, trace.endPoint)
                     end
                     
                 end

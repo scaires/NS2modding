@@ -32,6 +32,16 @@ function Player:GetIsVirtual()
     
 end
 
+function Player:OnReset()
+
+    LiveScriptActor.OnReset(self)
+    
+    self.score = 0
+    self.kills = 0
+    self.deaths = 0
+
+end
+
 /**
  * Called when the player entity is destroyed.
  */
@@ -261,22 +271,6 @@ function Player:SetPlasma(amount)
     
 end
 
-/**
- * Ends the use of the structure the player is currently using.
- */
-function Player:StopUsingStructure()
-
-    if (self.usingStructure ~= nil) then
-
-        self.usingStructure = nil
-        self.timeOfLastUse  = nil
-
-        self:Draw()
-    
-    end
-
-end
-
 function Player:GetDeathMapName()
     return Spectator.kMapName
 end
@@ -291,32 +285,7 @@ function Player:OnUpdate(deltaTime)
     
     self:UpdateOrderWaypoint()
 
-    if (self.usingStructure) then
-
-        // This is currently disabled since we will automatically stop using
-        // a structure when we get far enough away that we stop generating
-        // the use event.
-        /*
-        // Check if we've moved too far from the structure we're using to
-        // continue using it.
-        
-        local startPos   = self.usingStructurePosition
-        local currentPos = self:GetOrigin()
-        local distance   = Shared.DistanceBetweenPoints(startPos, currentPos)
-
-        local stopUsing = (distance > Player.kLoginBreakingDistance)
-        */
-
-        // Check if we haven't used the structure this tick. If so, we should
-        // processs the stop using notification.
-        
-        local time = Shared.GetTime()
-
-        if (time ~= self.timeOfLastUse) then
-            self:StopUsingStructure()
-        end
-
-    elseif (not self.alive and not self:isa("Spectator")) then
+    if (not self.alive and not self:isa("Spectator")) then
     
         local time = Shared.GetTime()
         
@@ -330,12 +299,14 @@ function Player:OnUpdate(deltaTime)
             
         end
 
-    // Pull out weapon again if we haven't built for a bit
-    elseif(self:GetWeaponHolstered() and (self.timeOfLastUse ~= nil) and (Shared.GetTime() - self.timeOfLastUse > .3)) then
-    
-        self:Draw()
-        
-    end    
+    else
+        self:UpdateUse(deltaTime)
+    end 
+
+    /*local viewModel = self:GetViewModelEntity()
+    if viewModel ~= nil then
+        viewModel:SetIsVisible(not self:GetWeaponHolstered())
+    end*/
 
     local gamerules = GetGamerules()
     self.gameStarted = gamerules:GetGameStarted()
@@ -544,7 +515,7 @@ function Player:ProcessBuyAction(techId)
                 // buy it
                 if self:AttemptToBuy(techId) then
                 
-                    self:DeductPlasma(cost)
+                    self:AddPlasma(-cost)
                     
                     return true
                 
@@ -663,16 +634,6 @@ end
 
 function Player:GetViewModelBlendTime()
     return .1
-end
-
-function Player:DeductPlasma(cost)
-
-    if(Shared.GetDevMode()) then
-        cost = 1
-    end
-    
-    self:AddPlasma(-cost)
-    
 end
 
 function Player:GetScore()

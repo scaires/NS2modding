@@ -84,9 +84,11 @@ function NS2Gamerules:CanEntityDoDamageTo(attacker, target)
         return false
     end
    
-    if (target == nil or target == {}) then
+    if (target == nil or target == {} or self:GetDarwinMode()) then
         return false
     elseif(Shared.GetCheatsEnabled() or Shared.GetDevMode()) then
+        return true
+    elseif attacker == nil then
         return true
     end
 
@@ -97,6 +99,12 @@ function NS2Gamerules:CanEntityDoDamageTo(attacker, target)
     
     // Command stations can kill even friendlies trapped inside
     if attacker ~= nil and attacker:isa("CommandStation") then
+        return true
+    end
+    
+    // Your own grenades can hurt you
+    local owner = attacker:GetOwner()
+    if attacker:isa("Grenade") and owner and owner:GetId() == target:GetId() then
         return true
     end
     
@@ -920,6 +928,8 @@ function NS2Gamerules:CheckGameEnd()
 end
 
 // Returns true if entity should be propagated to player
+// NOTE: this is only called for ScriptActors, so if your object extents
+// off Entity it needs to call this
 function NS2Gamerules:GetIsRelevant(player, entity, noRecurse)
 
     local relevant = false
@@ -927,19 +937,22 @@ function NS2Gamerules:GetIsRelevant(player, entity, noRecurse)
     // Hive sight blips only go to aliens and also have a bigger range
     local dist = player:GetDistance(entity)
     
-    if player:isa("Alien") and entity:isa("Blip") and (blip.entId ~= player:GetId()) then
+    if player:isa("Alien") and entity:isa("Blip") then
     
-        relevant = (dist < kHiveSightMaxRange)
-    
+        if (entity.entId ~= player:GetId()) then
+            relevant = (dist < kHiveSightMaxRange)
+        end
+        
     // Remove LOS check for perf while debugging
-    elseif(player:GetIsCommander()) then
+    elseif(player:GetIsCommander() and not entity:isa("Blip")) then
     
         // Don't return dynamic props with commAlpha < 1
         if entity:isa("PropDynamic") and entity.commAlpha ~= nil and entity.commAlpha < 1 then
         
             relevant = false
             
-        elseif(player:GetIsEntitySelected(entity) or player:GetIsEntityHotgrouped(entity) or player:GetIsEntityIdleWorker(entity)) then
+        // Send our hotgroups and also the command station we're in
+        elseif(player:GetIsEntitySelected(entity) or player:GetIsEntityHotgrouped(entity) or player:GetIsEntityIdleWorker(entity) or (player:GetHostCommandStructure():GetId() == entity:GetId())) then
         
             relevant = true
             
@@ -1062,33 +1075,6 @@ function NS2Gamerules:RespawnPlayer(player)
     team:AddPlayer(player)
     team:RespawnPlayer(player, nil, nil)
     
-end
-
-function NS2Gamerules:ApplyBulletGameplayEffects(player, trace)
-
-    if (trace.entity) then
-    
-        local direction = (trace.endPoint - startPoint):GetUnit()
-        self:ApplyBulletGameplayEffects(player, trace.entity, trace.endPoint, direction)
-        
-    end
-                
-    // Play ricochet sound for player locally for feedback
-    local surface = GetSurfaceFromTrace(trace)
-    if(surface ~= "" and surface ~= nil and surface ~= "unknown") then
-
-        // Play ricochet sound at world position for everyone else
-        Shared.PlayWorldSound(player, string.format(ClipWeapon.kRicochetMaterialSound, surface), nil, trace.endPoint)
-        
-        // If we are far away from our target, trigger a private sound so we can hear we hit something
-        if (trace.endPoint - player:GetOrigin()):GetLength() > 5 then
-            Shared.PlayPrivateSound(player, string.format(ClipWeapon.kRicochetMaterialSound, surface), player, .3, Vector(0, 0, 0))
-        end
-        
-    end
-    
-    player:SetTimeTargetHit()
-
 end
 
 ////////////////    
