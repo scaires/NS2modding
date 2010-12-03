@@ -40,38 +40,61 @@ function Sentry:AcquireTarget()
 
     local targetAcquired = nil
 
+	//'true' is ent1<ent2, false is ent1>ent2
+	function sortSentryTargets(ent1,ent2)
+		ent1distance = (ent1:GetModelOrigin() - self:GetModelOrigin()):GetLength()
+		ent2distance = (ent2:GetModelOrigin() - self:GetModelOrigin()):GetLength()
+		return ent1distance < ent2distance
+	end
+	
+	function findSentryTargets(targetList)
+		for index, target in pairs(targetList) do
+			local validTarget, distanceToTarget = self:GetIsTargetValid(target)
+			//Print("Sentry scanned target: %s => %s", SafeClassName(target), ToString(validTarget))
+			
+			if(validTarget) then
+			
+				local newTargetCloser = (self.shortestDistanceToTarget == nil or (distanceToTarget < self.shortestDistanceToTarget))
+				local newTargetIsaPlayer = target:isa("Player")
+		
+				// Give players priority over regular entities, but still pick closer players
+				if( (not self.targetIsaPlayer and newTargetIsaPlayer) or
+					(newTargetCloser and not (self.targetIsaPlayer and not newTargetIsaPlayer)) ) then
+			
+					// Set new target
+					targetAcquired = target
+					
+					self.shortestDistanceToTarget = distanceToTarget
+					self.targetIsaPlayer = newTargetIsaPlayer
+					
+				end           
+				
+			end
+		end		
+		return targetAcquired
+	end
+	
     if Shared.GetTime() > (self.timeOfLastTargetAcquisition + Sentry.kTargetCheckTime) then
     
         self.shortestDistanceToTarget = nil
         self.targetIsaPlayer = false
         
-        local targets = GetGamerules():GetEntities("LiveScriptActor", GetEnemyTeamNumber(self:GetTeamNumber()))
-        
+		local targets = GetGamerules():GetEntities("LiveScriptActor", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), Sentry.kRange)        
+
+		table.sort(targets, sortSentryTargets)
+		
+		local players = {}
+		
         for index, target in pairs(targets) do
-        
-            local validTarget, distanceToTarget = self:GetIsTargetValid(target)
-            //Print("Sentry scanned target: %s => %s", SafeClassName(target), ToString(validTarget))
-            
-            if(validTarget) then
-            
-                local newTargetCloser = (self.shortestDistanceToTarget == nil or (distanceToTarget < self.shortestDistanceToTarget))
-                local newTargetIsaPlayer = target:isa("Player")
-        
-                // Give players priority over regular entities, but still pick closer players
-                if( (not self.targetIsaPlayer and newTargetIsaPlayer) or
-                    (newTargetCloser and not (self.targetIsaPlayer and not newTargetIsaPlayer)) ) then
-            
-                    // Set new target
-                    targetAcquired = target
-                    
-                    self.shortestDistanceToTarget = distanceToTarget
-                    self.targetIsaPlayer = newTargetIsaPlayer
-                    
-                end           
-                
-            end
-                
-        end
+			if target:isa("Player") then
+				table.insert(players, target)
+			end
+		end
+		
+		targetAcquired = findSentryTargets(players)
+		if targetAcquired == nil then
+			targetAcquired = findSentryTargets(targets)
+		end
         
         self.timeOfLastTargetAcquisition = Shared.GetTime()
         

@@ -93,6 +93,10 @@ function Crag:GetSortedTargetList()
     // be before the second argument in the sequence (he default behavior is <).
     function sortCragTargets(ent1, ent2)
     
+		if ent1 == nil or ent2 == nil then
+			return false
+		end
+	
         // Heal players before structures
         if ent1:isa("Player") and not ent2:isa("Player") then
             return true
@@ -129,32 +133,32 @@ function Crag:PerformHealing()
     local entsHealed = 0
     
     for index, entity in ipairs(ents) do
-    
-        if entity:isa("Player") or entity:isa("Structure") then
-        
-            if (entity:AddHealth(Crag.kHealAmount) > 0) then
-            
-                entity:PlaySound(Crag.kHealSound)
-                
-                if entity:isa("Structure") or entity:isa("Onos") then
-                    Shared.CreateEffect(nil, Crag.kHealBigTargetEffect, entity)
-                else
-                    Shared.CreateEffect(nil, Crag.kHealTargetEffect, entity)
-                end
-                
-                entsHealed = entsHealed + 1
-                
-            end
-            
-            // Can only heal a certain number of targets
-            if (entsHealed >= Crag.kMaxTargets) then
-            
-                break
-                
-            end
-        
-        end
-    
+		if entity ~= nil then
+			if entity:isa("Player") or entity:isa("Structure") then
+			
+				if (entity:AddHealth(Crag.kHealAmount) > 0) then
+				
+					entity:PlaySound(Crag.kHealSound)
+					
+					if entity:isa("Structure") or entity:isa("Onos") then
+						Shared.CreateEffect(nil, Crag.kHealBigTargetEffect, entity)
+					else
+						Shared.CreateEffect(nil, Crag.kHealTargetEffect, entity)
+					end
+					
+					entsHealed = entsHealed + 1
+					
+				end
+				
+				// Can only heal a certain number of targets
+				if (entsHealed >= Crag.kMaxTargets) then
+				
+					break
+					
+				end
+			
+			end
+		end
     end
     
     if entsHealed > 0 then
