@@ -8,9 +8,11 @@
 
 //TCBM set sentry angles to that of builder
 function Sentry:setSentryAngles(builder)
-	local angles = Angles(self:GetAngles())
-	angles.yaw = Angles(builder:GetAngles()).yaw
-	self:SetAngles(angles)
+	if builder ~= nil then
+		local angles = Angles(self:GetAngles())
+		angles.yaw = Angles(builder:GetAngles()).yaw
+		self:SetAngles(angles)
+	end
 end
 
 function Sentry:OnConstructionComplete()

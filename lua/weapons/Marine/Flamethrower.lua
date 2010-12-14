@@ -132,44 +132,42 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
 
 	local endPoint = barrelPoint + fireDirection * range
 	local trace = Shared.TraceRay(barrelPoint, endPoint, PhysicsMask.Bullets, EntityFilterTwo(self,player))
-	
+	local hitEntities = {}
 	if trace.fraction < 1 then
 		Shared.CreateEffect(nil, Flamethrower.kImpactCinematic, nil, Coords.GetTranslation(trace.endPoint))
 		// Do damage to targets
-		local hitEntities = GetGamerules():GetEntities("LiveScriptActor", GetEnemyTeamNumber(self:GetTeamNumber()), trace.endPoint, (Flamethrower.kRange)/3)
+		hitEntities = GetGamerules():GetEntities("LiveScriptActor", -1, trace.endPoint, (Flamethrower.kRange)/5)
 
-		//local distToPlayer = (trace.endPoint - player:GetModelOrigin()):GetLength()
-		
-		//if distToPlayer < ((Flamethrower.kRange)/2) then
-		//	player:TakeDamage(Flamethrower.kDamage*(distToPlayer/((Flamethrower.kRange)/2)), player, self, player:GetModelOrigin(), -fireDirection)
-		//end
-		
+		local distToPlayer = (trace.endPoint - player:GetModelOrigin()):GetLength()
 		//damage player too
-		table.insertunique(hitEntities, player)
-		RadiusDamage(hitEntities, trace.endPoint, (Flamethrower.kRange)/2, Flamethrower.kDamage, player, EntityFilterOne(nil))
-		
-		//for index, ent in ipairs(hitEntities) do
-		//	table.insertunique(ents,ent)
-		//end
+		if distToPlayer < ((Flamethrower.kRange)/5) then
+			table.insertunique(hitEntities, player)
+		end
+
+		for index, ent in ipairs(hitEntities) do
+			table.insertunique(ents,ent)
+		end
 	end
 	
     for index, ent in ipairs(ents) do
     
-        if ent ~= player then
+		local inRadius = table.find(hitEntities, ent)
+	
+        if ent ~= player or inRadius then
         
             local toEnemy = GetNormalizedVector(ent:GetModelOrigin() - barrelPoint)
             local dotProduct = fireDirection:DotProduct(toEnemy)
         
             // Look for enemies in cone in front of us    
-            if dotProduct > .975 then
+            if dotProduct > .975 or inRadius then
 				
 				local trace = TraceToExtents(barrelPoint,ent,EntityFilterOne(player))
 				
-				if trace ~= nil then
-					// Do damage to them and catch them on fire
+				if trace ~= nil or inRadius then
+					// Do damage to them
 					ent:TakeDamage(Flamethrower.kDamage, player, self, ent:GetModelOrigin(), toEnemy)
 					
-					if GetGamerules():CanEntityDoDamageTo(player, ent) then
+					if GetGamerules():CanEntityDoDamageTo(player, ent) and ent ~= player then
 						//damage, armorUsed, healthUsed = ent:ComputeDamage(Flamethrower.kDamage, kFlamethrowerDamageType)
 						//Print("damage %d armorused %d, healthused %d",damage,armorUsed,healthUsed)
 						//if armorUsed == 0 then

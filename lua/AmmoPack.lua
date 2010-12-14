@@ -71,7 +71,19 @@ function AmmoPack:GetPackRecipient()
         end
     
     end
+	
+	local potentialRecipients = GetEntitiesIsaInRadius("Sentry", self:GetTeamNumber(), self:GetOrigin(), 2)
+    
+    for index, sentry in pairs(potentialRecipients) do
+        
+		if(sentry ~= nil and sentry:GetIsFunctioning() and (sentry:GetEnergy() < sentry:GetMaxEnergy()) ) then
+        
 
+			sentry:SetDesiredMode(Sentry.kMode.Reloading)
+            DestroyEntity(self)
+        end
+	end
+	
     return nil
     
 end

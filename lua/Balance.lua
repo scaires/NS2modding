@@ -154,7 +154,7 @@ kResourceTowerResourceInterval = 12
 	
 // MARINE DAMAGE	
 
-kClipWeaponStartClips = 2
+kClipWeaponStartClips = 3
 
 kRifleDamage = 10	
 kRifleDamageType = kDamageType.Normal	
@@ -198,7 +198,7 @@ kShotgunMinDamageRange = 20
 kShotgunMaxDamageRange = 2	
 kShotgunSpreadDegrees = 20	
 	
-kFlamethrowerDamage = 6.25	
+kFlamethrowerDamage = 12.5	
 kFlamethrowerDamageType = kDamageType.Flame	
 kFlamethrowerFireDelay = 0.25	
 kFlamethrowerClipSize = 20	

@@ -56,7 +56,7 @@ function HydraAbility:GetIdleAnimation()
 end
 
 function HydraAbility:GetEnergyCost(player)
-    return 0
+    return HydraAbility.kHydraAbilityEnergyCost
 end
 
 function HydraAbility:GetPrimaryAttackDelay()
@@ -106,6 +106,7 @@ function HydraAbility:PerformPrimaryAttack(player)
                 
             else
                 Shared.PlayPrivateSound(player, player:GetNotEnoughResourcesSound(), player, 1.0, Vector(0, 0, 0))
+				player:AddEnergy(HydraAbility.kHydraAbilityEnergyCost)
             end
             
         else
@@ -142,7 +143,7 @@ function HydraAbility:CreateHydra(player)
                 player:PlaySound(player:GetPlaceBuildingSound())
                 
                 player:AddPlasma( -cost )
-                player:AddEnergy(-HydraAbility.kHydraAbilityEnergyCost)
+                
 				
             else
             

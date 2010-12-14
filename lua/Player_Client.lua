@@ -469,6 +469,7 @@ function PlayerUI_GetPlayerResources()
         return player:GetDisplayPlasma()
     end
     return 0
+end
 
 //TCBM player team carbon
 function PlayerUI_GetPlayerTeamCarbon()

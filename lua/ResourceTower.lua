@@ -15,7 +15,7 @@ ResourceTower.kMapName = "resourcetower"
 
 ResourceTower.kPlasmaInjection = 1
 //TCBM: halved resource rate
-ResourceTower.kCarbonInjection = 0.5
+ResourceTower.kCarbonInjection = 1
 ResourceTower.kMaxUpgradeLevel = 3
 
 // Don't start generating resources right away, wait a short time
