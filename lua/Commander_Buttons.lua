@@ -193,7 +193,7 @@ function Commander:UpdateSharedTechButtons()
         
             if(entity ~= nil) then
 
-                local techButtons = entity:GetTechButtons(self.menuTechId)
+                local techButtons = self:GetCurrentTechButtons(self.menuTechId, entity)
                 
                 if(techButtons ~= nil) then
                     table.insert(selectedTechButtons, techButtons)
@@ -293,32 +293,22 @@ function Commander:InitTechTreeMaterialOffsets()
     
     // First row
     self.kMarineTechIdToMaterialOffset[kTechId.CommandStation] = 0
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateCommandStation] = 0
     self.kMarineTechIdToMaterialOffset[kTechId.CommandStationUpgradesMenu] = 68
     
     self.kMarineTechIdToMaterialOffset[kTechId.Armory] = 1
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateArmory] = 1
     self.kMarineTechIdToMaterialOffset[kTechId.RifleUpgradeTech] = 66
-    self.kMarineTechIdToMaterialOffset[kTechId.ArmoryUpgradesMenu] = 68
+    self.kMarineTechIdToMaterialOffset[kTechId.ArmoryEquipmentMenu] = 68
     self.kMarineTechIdToMaterialOffset[kTechId.MAC] = 2
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateMAC] = 2
     // Change offset in CommanderUI_GetIdleWorkerOffset when changing extractor
     self.kMarineTechIdToMaterialOffset[kTechId.Extractor] = 3
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateExtractor] = 3
     self.kMarineTechIdToMaterialOffset[kTechId.InfantryPortal] = 4
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateInfantryPortal] = 4
     self.kMarineTechIdToMaterialOffset[kTechId.InfantryPortalTransponderTech] = 4
     self.kMarineTechIdToMaterialOffset[kTechId.InfantryPortalTransponderUpgrade] = 4
     self.kMarineTechIdToMaterialOffset[kTechId.Sentry] = 5
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateSentry] = 5
     self.kMarineTechIdToMaterialOffset[kTechId.RoboticsFactory] = 6
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateRoboticsFactory] = 6
     self.kMarineTechIdToMaterialOffset[kTechId.Observatory] = 7
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateObservatory] = 7
     self.kMarineTechIdToMaterialOffset[kTechId.WeaponsModule] = 8
-    self.kMarineTechIdToMaterialOffset[kTechId.ArmoryWeaponModuleMenu] = 8
-    self.kMarineTechIdToMaterialOffset[kTechId.PrototypeModule] = 9
-    self.kMarineTechIdToMaterialOffset[kTechId.ArmoryPrototypeModuleMenu] = 9
+    self.kMarineTechIdToMaterialOffset[kTechId.PrototypeLab] = 9
     self.kMarineTechIdToMaterialOffset[kTechId.PowerPoint] = 10    
     
     // Second row - Non-player orders
@@ -327,11 +317,15 @@ function Commander:InitTechTreeMaterialOffsets()
     self.kMarineTechIdToMaterialOffset[kTechId.Stop] = 14
     self.kMarineTechIdToMaterialOffset[kTechId.RootMenu] = 15
     self.kMarineTechIdToMaterialOffset[kTechId.Cancel] = 16
-    self.kMarineTechIdToMaterialOffset[kTechId.BuildMenu] = 17    
+    //self.kMarineTechIdToMaterialOffset[kTechId.] = 17 // MAC build
+    
     self.kMarineTechIdToMaterialOffset[kTechId.Attack] = 18
     self.kMarineTechIdToMaterialOffset[kTechId.SetRally] = 19
-    self.kMarineTechIdToMaterialOffset[kTechId.OrdersMenu] = 20
+    self.kMarineTechIdToMaterialOffset[kTechId.SetTarget] = 28
+    self.kMarineTechIdToMaterialOffset[kTechId.SquadMenu] = 20
     self.kMarineTechIdToMaterialOffset[kTechId.Weld] = 21
+    self.kMarineTechIdToMaterialOffset[kTechId.BuildMenu] = 22
+    self.kMarineTechIdToMaterialOffset[kTechId.AdvancedMenu] = 23    
     
     // Third row - Player/squad orders
     self.kMarineTechIdToMaterialOffset[kTechId.SquadMove] = 24
@@ -343,6 +337,7 @@ function Commander:InitTechTreeMaterialOffsets()
     // "alert" for 30
     self.kMarineTechIdToMaterialOffset[kTechId.SquadRegroup] = 31
     self.kMarineTechIdToMaterialOffset[kTechId.SquadSeekAndDestroy] = 32    
+    self.kMarineTechIdToMaterialOffset[kTechId.AssistMenu] = 33
     
     // Fourth row - droppables, research
     self.kMarineTechIdToMaterialOffset[kTechId.AmmoPack] = 36
@@ -357,8 +352,7 @@ function Commander:InitTechTreeMaterialOffsets()
     self.kMarineTechIdToMaterialOffset[kTechId.FlamethrowerTech] = 42
     self.kMarineTechIdToMaterialOffset[kTechId.FlamethrowerAltTech] = 42
     self.kMarineTechIdToMaterialOffset[kTechId.SentryTech] = 43
-    self.kMarineTechIdToMaterialOffset[kTechId.MASC] = 44
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateMASC] = 44
+    self.kMarineTechIdToMaterialOffset[kTechId.ARC] = 44
     self.kMarineTechIdToMaterialOffset[kTechId.CatPack] = 45
     self.kMarineTechIdToMaterialOffset[kTechId.CatPackTech] = 45
     self.kMarineTechIdToMaterialOffset[kTechId.NerveGasTech] = 46
@@ -370,15 +364,13 @@ function Commander:InitTechTreeMaterialOffsets()
     self.kMarineTechIdToMaterialOffset[kTechId.Armor2] = 50
     self.kMarineTechIdToMaterialOffset[kTechId.Armor3] = 51
     self.kMarineTechIdToMaterialOffset[kTechId.NanoDefense] = 52
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateTech] = 53
-    self.kMarineTechIdToMaterialOffset[kTechId.ReplicateMenu] = 54    
     
     // upgrades
     self.kMarineTechIdToMaterialOffset[kTechId.Weapons1] = 55
     self.kMarineTechIdToMaterialOffset[kTechId.Weapons2] = 56
     self.kMarineTechIdToMaterialOffset[kTechId.Weapons3] = 57
     self.kMarineTechIdToMaterialOffset[kTechId.CommandStationUpgradesMenu] = 58
-    self.kMarineTechIdToMaterialOffset[kTechId.ArmoryUpgradesMenu] = 59
+    self.kMarineTechIdToMaterialOffset[kTechId.ArmoryEquipmentMenu] = 59
     
     self.kMarineTechIdToMaterialOffset[kTechId.Marine] = 60
     self.kMarineTechIdToMaterialOffset[kTechId.Heavy] = 61
@@ -389,8 +381,8 @@ function Commander:InitTechTreeMaterialOffsets()
     self.kMarineTechIdToMaterialOffset[kTechId.AdvancedArmory] = 65
     self.kMarineTechIdToMaterialOffset[kTechId.AdvancedArmoryUpgrade] = 65
     self.kMarineTechIdToMaterialOffset[kTechId.RifleUpgradeTech] = 66
-    self.kMarineTechIdToMaterialOffset[kTechId.MASCSplashTech] = 67
-    self.kMarineTechIdToMaterialOffset[kTechId.MASCArmorTech] = 68
+    self.kMarineTechIdToMaterialOffset[kTechId.ARCSplashTech] = 67
+    self.kMarineTechIdToMaterialOffset[kTechId.ARCArmorTech] = 68
 
     self.kMarineTechIdToMaterialOffset[kTechId.GrenadeLauncherTech] = 72
     self.kMarineTechIdToMaterialOffset[kTechId.JetpackFuelTech] = 73      
@@ -398,8 +390,8 @@ function Commander:InitTechTreeMaterialOffsets()
     self.kMarineTechIdToMaterialOffset[kTechId.ExoskeletonTech] = 75
     self.kMarineTechIdToMaterialOffset[kTechId.Exoskeleton] = 76
     self.kMarineTechIdToMaterialOffset[kTechId.ExoskeletonLockdownTech] = 77
-    self.kMarineTechIdToMaterialOffset[kTechId.MASCUndeploy] = 78
-    self.kMarineTechIdToMaterialOffset[kTechId.MASCDeploy] = 79       
+    self.kMarineTechIdToMaterialOffset[kTechId.ARCUndeploy] = 78
+    self.kMarineTechIdToMaterialOffset[kTechId.ARCDeploy] = 79       
     
     self.kMarineTechIdToMaterialOffset[kTechId.MACMinesTech] = 80
     self.kMarineTechIdToMaterialOffset[kTechId.MACMine] = 81
@@ -411,6 +403,20 @@ function Commander:InitTechTreeMaterialOffsets()
     self.kMarineTechIdToMaterialOffset[kTechId.DoorClose] = 86
     self.kMarineTechIdToMaterialOffset[kTechId.DoorLock] = 87
     self.kMarineTechIdToMaterialOffset[kTechId.DoorUnlock] = 88
+    // 89 = nozzle
+    // 90 = tech point
+    
+    // Robotics factory menus
+    self.kMarineTechIdToMaterialOffset[kTechId.RoboticsFactoryARCUpgradesMenu] = 91
+    self.kMarineTechIdToMaterialOffset[kTechId.RoboticsFactoryMACUpgradesMenu] = 93
+    self.kMarineTechIdToMaterialOffset[kTechId.PrototypeLab] = 93
+    self.kMarineTechIdToMaterialOffset[kTechId.PrototypeLabUpgradesMenu] = 94        
+    
+    self.kMarineTechIdToMaterialOffset[kTechId.SelectRedSquad] = 96
+    self.kMarineTechIdToMaterialOffset[kTechId.SelectBlueSquad] = 97
+    self.kMarineTechIdToMaterialOffset[kTechId.SelectGreenSquad] = 98
+    self.kMarineTechIdToMaterialOffset[kTechId.SelectYellowSquad] = 99
+    self.kMarineTechIdToMaterialOffset[kTechId.SelectOrangeSquad] = 100
 
     // Init alien offsets
     self.kAlienTechIdToMaterialOffset = {}
@@ -428,7 +434,7 @@ function Commander:InitTechTreeMaterialOffsets()
     // Menus
     self.kAlienTechIdToMaterialOffset[kTechId.BuildMenu] = 8
     self.kAlienTechIdToMaterialOffset[kTechId.RootMenu] = 9
-    self.kAlienTechIdToMaterialOffset[kTechId.OrdersMenu] = 10
+    self.kAlienTechIdToMaterialOffset[kTechId.SquadMenu] = 10
     self.kAlienTechIdToMaterialOffset[kTechId.MarkersMenu] = 11
     self.kAlienTechIdToMaterialOffset[kTechId.UpgradesMenu] = 12
     self.kAlienTechIdToMaterialOffset[kTechId.Grow] = 13

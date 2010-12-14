@@ -6,6 +6,17 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+function PowerPoint:UpdatePoweredLights()
+    
+    if not self.lightList then    
+        self.lightList = GetLightsForPowerPoint(self)
+    end
+    
+    for lightIndex, renderLight in ipairs(self.lightList) do
+        self:UpdatePoweredLight(renderLight)
+    end
+end
+
 function PowerPoint:UpdatePoweredLight(renderLight)
 
     local lightMode = self:GetLightMode()

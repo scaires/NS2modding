@@ -36,7 +36,7 @@ Crag.kHealRadius = 10
 Crag.kHealAmount = 10
 Crag.kMaxTargets = 3
 Crag.kThinkInterval = .25
-Crag.kHealInterval = 1.0
+Crag.kHealInterval = 2.0
 Crag.kUmbraDuration = 8
 Crag.kUmbraRadius = 5
 
@@ -78,9 +78,10 @@ function Crag:GetSortedTargetList()
     for index, entity in ipairs(ents) do
 
         if (entity:GetHealth() < entity:GetMaxHealth()) or (entity:GetArmor() < entity:GetMaxArmor()) then
-        
-            if (not entity:isa("Structure") or entity:GetIsBuilt()) or (not entity:isa("Embryo")) then
-        
+            
+            // Crags don't heal self
+            if entity ~= self then
+    
                 table.insert(targets, entity)
                 
             end
@@ -91,12 +92,10 @@ function Crag:GetSortedTargetList()
     
     // The comparison function must return a boolean value specifying whether the first argument should 
     // be before the second argument in the sequence (he default behavior is <).
+    // All table.sort functions need to be deterministic.
+    // For example, if ent1 < ent2 than later the same ent2 cannot be < ent1.
     function sortCragTargets(ent1, ent2)
     
-		if ent1 == nil or ent2 == nil then
-			return false
-		end
-	
         // Heal players before structures
         if ent1:isa("Player") and not ent2:isa("Player") then
             return true
@@ -112,7 +111,8 @@ function Crag:GetSortedTargetList()
         end
         
         // Heal most hurt entities first (looks at total percentage of health)
-        if ent1:GetHealthScalar() <= ent2:GetHealthScalar() then
+        // ent2 ~= self is required so this function is deterministic.
+        if ent2 ~= self and ent1:GetHealthScalar() <= ent2:GetHealthScalar() then
             return true
         end
                 
@@ -133,32 +133,28 @@ function Crag:PerformHealing()
     local entsHealed = 0
     
     for index, entity in ipairs(ents) do
-		if entity ~= nil then
-			if entity:isa("Player") or entity:isa("Structure") then
-			
-				if (entity:AddHealth(Crag.kHealAmount) > 0) then
-				
-					entity:PlaySound(Crag.kHealSound)
-					
-					if entity:isa("Structure") or entity:isa("Onos") then
-						Shared.CreateEffect(nil, Crag.kHealBigTargetEffect, entity)
-					else
-						Shared.CreateEffect(nil, Crag.kHealTargetEffect, entity)
-					end
-					
-					entsHealed = entsHealed + 1
-					
-				end
-				
-				// Can only heal a certain number of targets
-				if (entsHealed >= Crag.kMaxTargets) then
-				
-					break
-					
-				end
-			
-			end
-		end
+    
+        if (entity:AddHealth(Crag.kHealAmount) > 0) then
+        
+            entity:PlaySound(Crag.kHealSound)
+            
+            if entity:isa("Structure") or entity:isa("Onos") then
+                Shared.CreateEffect(nil, Crag.kHealBigTargetEffect, entity)
+            else
+                Shared.CreateEffect(nil, Crag.kHealTargetEffect, entity)
+            end
+            
+            entsHealed = entsHealed + 1
+            
+        end
+        
+        // Can only heal a certain number of targets
+        if (entsHealed >= Crag.kMaxTargets) then
+        
+            break
+            
+        end
+    
     end
     
     if entsHealed > 0 then
@@ -305,9 +301,5 @@ Shared.LinkClassToMap("Crag", Crag.kMapName, {})
 class 'MatureCrag' (Crag)
 
 MatureCrag.kMapName = "maturecrag"
-
-function MatureCrag:GetTechId()
-    return kTechId.MatureCrag
-end
 
 Shared.LinkClassToMap("MatureCrag", MatureCrag.kMapName, {})

@@ -62,8 +62,7 @@ function ClipWeapon:GetBulletsPerShot()
 end
 
 function ClipWeapon:GetNumStartClips()
-	//TCBM: Use starting clip value from balance
-	return kClipWeaponStartClips
+    return 4
 end
 
 function ClipWeapon:GetClipSize()
@@ -474,7 +473,7 @@ function ClipWeapon:FireBullets(player, bulletsToShoot, range, penetration)
                     local worldRicochetSound = string.format(ClipWeapon.kRicochetMaterialSound, surface)
 
                     // Play ricochet sound at world position for everyone else
-                    Shared.PlayWorldSound(player, worldRicochetSound, nil, trace.endPoint)
+                    Shared.PlayWorldSound(nil, worldRicochetSound, nil, trace.endPoint)
                         
                     // If we are far away from our target, trigger a private sound so we can hear we hit something
                     if (trace.endPoint - player:GetOrigin()):GetLength() > 5 then

@@ -82,7 +82,7 @@ function Button:SetUseState(useState)
     
 end
 
-function Button:OnUse()
+function Button:OnUse(player, elapsedTime, useAttachPoint)
 
     if(self.useState == kUseStateOff) then
         self:SetUseState(kUseStateToOn)

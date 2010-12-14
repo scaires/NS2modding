@@ -18,8 +18,8 @@ local kSquadColors =
     {0, 0, 255, 255},      // blue
     {0, 255, 0, 255},      // green
     {255, 255, 0, 255},    // yellow
-    {231, 0, 255, 255},    // best squad - purple
-    {255, 166, 0, 255},    // orange    
+    {255, 166, 0, 255},    // best squad - orange    
+    {231, 0, 255, 255},    // purple
     {255, 255, 255, 255},  // white
     {0, 0, 0, 255},        // black
     {255, 154, 237, 255},  // pink

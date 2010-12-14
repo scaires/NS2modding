@@ -43,12 +43,6 @@ function Structure:OnUse(player, elapsedTime, useAttachPoint)
             // Calling code will put weapon away we return true
             self:Construct(Structure.kBuildInterval)
             
-            // Play puff of sparks
-            Shared.CreateEffect(nil, MAC.kBuildEffect, nil, self:GetCoords())
-            
-            // Play weld/construct sound occasionally
-            Shared.PlayWorldSound(nil, MAC.kBuildSound, player, Vector(0, 0, 0))
-            
             player:SetActivityEnd(Structure.kBuildInterval)
 
             used = true
@@ -392,7 +386,12 @@ end
 
 function Structure:OnReset()
 
+    // OnCreate will reset the team number, so preseve it here
+    local teamNumber = self.teamNumber
+
     Structure.OnCreate(self)
+    
+    self.teamNumber = teamNumber
     
     self:ClearAttached()
     

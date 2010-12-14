@@ -164,7 +164,7 @@ function MarineTeam:InitTechTree()
     self.techTree:AddUpgradeNode(kTechId.ExtractorUpgrade,        kTechId.Extractor,           kTechId.None)
     self.techTree:AddBuildNode(kTechId.InfantryPortal,            kTechId.None,                kTechId.None)
     self.techTree:AddResearchNode(kTechId.SentryTech,             kTechId.None,                kTechId.None)
-    self.techTree:AddBuildNode(kTechId.Sentry,                    kTechId.SentryTech,          kTechId.None)
+    self.techTree:AddBuildNode(kTechId.Sentry,              kTechId.None,                kTechId.None)
     self.techTree:AddBuildNode(kTechId.Armory,                    kTechId.None,                kTechId.None)  
     self.techTree:AddEnergyBuildNode(kTechId.MAC,                 kTechId.None,                kTechId.None)
     
@@ -178,6 +178,12 @@ function MarineTeam:InitTechTree()
     self.techTree:AddResearchNode(kTechId.MACWeldingTech,           kTechId.Armory,              kTechId.None)
     
     // Squad tech nodes
+    self.techTree:AddOrder(kTechId.SelectRedSquad)
+    self.techTree:AddOrder(kTechId.SelectBlueSquad)
+    self.techTree:AddOrder(kTechId.SelectGreenSquad)
+    self.techTree:AddOrder(kTechId.SelectYellowSquad)
+    self.techTree:AddOrder(kTechId.SelectOrangeSquad)
+    
     self.techTree:AddOrder(kTechId.SquadMove)
     self.techTree:AddOrder(kTechId.SquadAttack)
     self.techTree:AddOrder(kTechId.SquadDefend)
@@ -187,7 +193,6 @@ function MarineTeam:InitTechTree()
     
     // Commander abilities
     self.techTree:AddTargetedActivation(kTechId.NanoDefense,       kTechId.None,                kTechId.None)
-    self.techTree:AddResearchNode(kTechId.ReplicateTech,           kTechId.CommandFacility,     kTechId.None)
     
     self.techTree:AddMenu(kTechId.CommandStationUpgradesMenu)
     
@@ -196,16 +201,12 @@ function MarineTeam:InitTechTree()
     self.techTree:AddBuyNode(kTechId.RifleUpgrade, kTechId.RifleUpgradeTech, kTechId.None, kTechId.Rifle)
     
     self.techTree:AddMenu(kTechId.ArmoryUpgradesMenu)
-    self.techTree:AddMenu(kTechId.ArmoryWeaponModuleMenu)
-    self.techTree:AddMenu(kTechId.ArmoryPrototypeModuleMenu)
-    self.techTree:AddMenu(kTechId.ReplicateMenu)
+    self.techTree:AddMenu(kTechId.ArmoryEquipmentMenu)
     
     self.techTree:AddUpgradeNode(kTechId.AdvancedArmoryUpgrade,  kTechId.CommandFacility,        kTechId.InfantryPortal)
     
     self.techTree:AddResearchNode(kTechId.Armor1,                 kTechId.Armory,              kTechId.None)
-    self.techTree:AddResearchNode(kTechId.Armor2,                 kTechId.Armor1,              kTechId.None)
     self.techTree:AddResearchNode(kTechId.Weapons1,               kTechId.Armory,               kTechId.None)
-    self.techTree:AddResearchNode(kTechId.Weapons2,               kTechId.Weapons1,            kTechId.None)
     
     // Marine tier 2
     self.techTree:AddSpecial(kTechId.TwoCommandStations)
@@ -214,7 +215,9 @@ function MarineTeam:InitTechTree()
     self.techTree:AddUpgradeNode(kTechId.AdvancedArmory,               kTechId.CommandFacility,        kTechId.None)
     self.techTree:AddResearchNode(kTechId.PhaseTech,                    kTechId.CommandFacility,        kTechId.None)
     self.techTree:AddResearchNode(kTechId.InfantryPortalTransponderTech,    kTechId.CommandFacility,        kTechId.None)
-    
+    self.techTree:AddResearchNode(kTechId.Armor2,                 kTechId.Armor1,              kTechId.CommandFacility)
+    self.techTree:AddResearchNode(kTechId.Weapons2,               kTechId.Weapons1,            kTechId.CommandFacility)
+
     self.techTree:AddBuildNode(kTechId.Observatory,               kTechId.CommandFacility,       kTechId.None)      
     self.techTree:AddTargetedActivation(kTechId.Scan,             kTechId.None,                 kTechId.None)
     self.techTree:AddActivation(kTechId.DistressBeacon)
@@ -229,27 +232,12 @@ function MarineTeam:InitTechTree()
     self.techTree:AddResearchNode(kTechId.MACEMPTech,          kTechId.CommandFacility,           kTechId.None)        
     self.techTree:AddResearchNode(kTechId.MACSpeedTech,           kTechId.InfantryPortal,            kTechId.None)        
     
-    // Armory upgrades
-    self.techTree:AddResearchNode(kTechId.Armor3,                 kTechId.Armor2,              kTechId.CommandFacility)
-    self.techTree:AddResearchNode(kTechId.Weapons3,               kTechId.Weapons2,            kTechId.CommandFacility)
-    
     // Door actions
     self.techTree:AddBuildNode(kTechId.Door, kTechId.None, kTechId.None)
     self.techTree:AddActivation(kTechId.DoorOpen)
     self.techTree:AddActivation(kTechId.DoorClose)
     self.techTree:AddActivation(kTechId.DoorLock)
     self.techTree:AddActivation(kTechId.DoorUnlock)
-    
-    // Replication
-    self.techTree:AddTargetedActivation(kTechId.ReplicateCommandStation,     kTechId.CommandStation,         kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateExtractor,          kTechId.Extractor,              kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateInfantryPortal,     kTechId.InfantryPortal,         kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateArmory,             kTechId.Armory,                 kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateSentry,             kTechId.Sentry,                 kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateObservatory,        kTechId.Observatory,            kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateRoboticsFactory,    kTechId.RoboticsFactory,        kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateMAC,                kTechId.MAC,                    kTechId.ReplicateTech)
-    self.techTree:AddTargetedActivation(kTechId.ReplicateMASC,               kTechId.MASC,                   kTechId.ReplicateTech)
     
     // Weapon-specific
     self.techTree:AddResearchNode(kTechId.ShotgunTech,           kTechId.Armory,              kTechId.None)
@@ -266,32 +254,42 @@ function MarineTeam:InitTechTree()
     self.techTree:AddResearchNode(kTechId.FlamethrowerAltTech,           kTechId.FlamethrowerTech,                kTechId.None)
     self.techTree:AddBuyNode(kTechId.FlamethrowerAlt,                    kTechId.FlamethrowerAltTech,                kTechId.None, kTechId.Flamethrower)
     
-    // MASCs
+    // ARCs
     self.techTree:AddBuildNode(kTechId.RoboticsFactory,             kTechId.CommandFacility,              kTechId.None)      
-    self.techTree:AddManufactureNode(kTechId.MASC,                          kTechId.RoboticsFactory,                kTechId.None)        
-    self.techTree:AddActivation(kTechId.MASCDeploy)
-    self.techTree:AddActivation(kTechId.MASCUndeploy)
+    self.techTree:AddManufactureNode(kTechId.ARC,                          kTechId.RoboticsFactory,                kTechId.None)        
+    self.techTree:AddActivation(kTechId.ARCDeploy)
+    self.techTree:AddActivation(kTechId.ARCUndeploy)
+    
+    // Robotics factory menus
+    self.techTree:AddMenu(kTechId.RoboticsFactoryARCUpgradesMenu)
+    self.techTree:AddMenu(kTechId.RoboticsFactoryMACUpgradesMenu)
     
     // Marine tier 3
     self.techTree:AddSpecial(kTechId.ThreeCommandStations)
     self.techTree:AddBuildNode(kTechId.CommandCenter,      kTechId.None,                kTechId.None)
     self.techTree:AddUpgradeNode(kTechId.CommandCenterUpgrade,   kTechId.ThreeCommandStations,              kTechId.Armory)
-    self.techTree:AddResearchNode(kTechId.PrototypeModule,          kTechId.AdvancedArmory,              kTechId.CommandCenter)        
-    self.techTree:AddResearchNode(kTechId.MASCSplashTech,           kTechId.RoboticsFactory,         kTechId.CommandCenter)
-    self.techTree:AddResearchNode(kTechId.MASCArmorTech,           kTechId.RoboticsFactory,          kTechId.CommandCenter)
+    self.techTree:AddBuildNode(kTechId.PrototypeLab,          kTechId.AdvancedArmory,              kTechId.CommandCenter)        
+    self.techTree:AddResearchNode(kTechId.ARCSplashTech,           kTechId.RoboticsFactory,         kTechId.CommandCenter)
+    self.techTree:AddResearchNode(kTechId.ARCArmorTech,           kTechId.RoboticsFactory,          kTechId.CommandCenter)
+    
+    self.techTree:AddMenu(kTechId.PrototypeLabUpgradesMenu)
+
+    // Armory upgrades
+    self.techTree:AddResearchNode(kTechId.Armor3,                 kTechId.Armor2,              kTechId.CommandCenter)
+    self.techTree:AddResearchNode(kTechId.Weapons3,               kTechId.Weapons2,            kTechId.CommandCenter)
 
     // Jetpack
-    self.techTree:AddResearchNode(kTechId.JetpackTech,           kTechId.PrototypeModule, kTechId.CommandCenter)
+    self.techTree:AddResearchNode(kTechId.JetpackTech,           kTechId.PrototypeLab, kTechId.CommandCenter)
     // TODO: Make jetpacks depend on ThreeCommandStations
-    self.techTree:AddBuyNode(kTechId.Jetpack,                    kTechId.JetpackTech, kTechId.PrototypeModule)
+    self.techTree:AddBuyNode(kTechId.Jetpack,                    kTechId.JetpackTech, kTechId.PrototypeLab)
     self.techTree:AddResearchNode(kTechId.JetpackFuelTech,       kTechId.JetpackTech, kTechId.CommandCenter)
     self.techTree:AddResearchNode(kTechId.JetpackArmorTech,      kTechId.JetpackTech, kTechId.CommandCenter)
     
     // Exoskeleton
-    self.techTree:AddResearchNode(kTechId.ExoskeletonTech,       kTechId.PrototypeModule, kTechId.CommandCenter)
+    self.techTree:AddResearchNode(kTechId.ExoskeletonTech,       kTechId.PrototypeLab, kTechId.CommandCenter)
     // TODO: Make exoskeletons depend on ThreeCommandStations
-    self.techTree:AddBuyNode(kTechId.Exoskeleton,                kTechId.ExoskeletonTech, kTechId.PrototypeModule)
-    self.techTree:AddResearchNode(kTechId.DualMinigunTech,       kTechId.ExoskeletonTech, kTechId.PrototypeModule)
+    self.techTree:AddBuyNode(kTechId.Exoskeleton,                kTechId.ExoskeletonTech, kTechId.PrototypeLab)
+    self.techTree:AddResearchNode(kTechId.DualMinigunTech,       kTechId.ExoskeletonTech, kTechId.PrototypeLab)
     
     self.techTree:AddResearchNode(kTechId.ExoskeletonLockdownTech,   kTechId.ExoskeletonTech, kTechId.CommandCenter)
     self.techTree:AddResearchNode(kTechId.ExoskeletonUpgradeTech,    kTechId.ExoskeletonTech, kTechId.CommandCenter)   

@@ -32,11 +32,16 @@ function RoboticsFactory:GetTechButtons(techId)
 
     if(techId == kTechId.RootMenu) then
     
-        local techButtons = {   kTechId.MASC, kTechId.MASCArmorTech, kTechId.MASCSplashTech, kTechId.None, 
-                                kTechId.SetRally, kTechId.None, kTechId.None, kTechId.None, 
-                                kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle }
-        
-        return techButtons
+        return {   kTechId.RoboticsFactoryMACUpgradesMenu, kTechId.RoboticsFactoryARCUpgradesMenu, kTechId.None, kTechId.None, 
+                    kTechId.None, kTechId.ARC, kTechId.None, kTechId.None }
+    
+    elseif techId == kTechId.RoboticsFactoryARCUpgradesMenu then
+        return {   kTechId.ARCArmorTech, kTechId.ARCSplashTech, kTechId.None, kTechId.None,
+                    kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu }
+                    
+    elseif techId == kTechId.RoboticsFactoryMACUpgradesMenu then
+        return {   kTechId.MACSpeedTech, kTechId.MACEMPTech, kTechId.MACMinesTech, kTechId.None,
+                    kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu }
         
     end
     

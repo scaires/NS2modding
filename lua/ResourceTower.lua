@@ -55,7 +55,7 @@ function ResourceTower:GiveResourcesToTeam(player)
 	//TCBM: divide plasma evenly among team members
     local plasma = (ResourceTower.kPlasmaInjection/(self:GetTeam():GetNumPlayers())) * (1 + self:GetUpgradeLevel() * kResourceUpgradeAmount)
     player:AddPlasma(plasma, true)
-	//Print("player plasma: %f + %f", plasma, player.plasma)
+
 end
 
 function ResourceTower:GetDescription()

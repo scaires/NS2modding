@@ -172,20 +172,28 @@ function OnCommandSpawn(client, className)
 
 end
 
-function OnCommandEnts(client)
+function OnCommandEnts(client, className)
 
     local player = client:GetControllingPlayer()
+    if Shared.GetCheatsEnabled() then
     
-    local entityCount = table.maxn(GetEntitiesIsa("Entity", -1))
-    
-    local weaponCount = table.maxn(GetEntitiesIsa("Weapon", -1))
-    local playerCount = table.maxn(GetEntitiesIsa("Player", -1))
-    local structureCount = table.maxn(GetEntitiesIsa("Structure", -1))
-    local playersOnPlayingTeams = GetGamerules():GetTeam1():GetNumPlayers() + GetGamerules():GetTeam2():GetNumPlayers()
-    local commandStationsOnTeams = GetGamerules():GetTeam1():GetNumCommandStructures() + GetGamerules():GetTeam2():GetNumCommandStructures()
-    local blipCount = table.maxn(GetEntitiesIsa("Blip"))
-
-    Server.Broadcast(player, string.format("%d entities (%s, %d playing, %d %s, %d %s, %s, %d command structures on teams).", entityCount, Pluralize(playerCount, "player"), playersOnPlayingTeams, weaponCount, Pluralize(weaponCount, "weapon"), structureCount, Pluralize(structureCount, "structure"), Pluralize(blipCount, "blip"), commandStationsOnTeams))
+        local entityCount = table.maxn(GetEntitiesIsa("Entity", -1))
+        
+        local weaponCount = table.maxn(GetEntitiesIsa("Weapon", -1))
+        local playerCount = table.maxn(GetEntitiesIsa("Player", -1))
+        local structureCount = table.maxn(GetEntitiesIsa("Structure", -1))
+        local playersOnPlayingTeams = GetGamerules():GetTeam1():GetNumPlayers() + GetGamerules():GetTeam2():GetNumPlayers()
+        local commandStationsOnTeams = GetGamerules():GetTeam1():GetNumCommandStructures() + GetGamerules():GetTeam2():GetNumCommandStructures()
+        local blipCount = table.maxn(GetEntitiesIsa("Blip"))
+        
+        if className then
+            local numClassEnts = table.count(GetEntitiesIsa(className))
+            Server.Broadcast(player, Pluralize(numClassEnts, className))
+        else
+            Server.Broadcast(player, string.format("%d entities (%s, %d playing, %s, %s, %s, %d command structures on teams).", 
+                                                    entityCount, Pluralize(playerCount, "player"), playersOnPlayingTeams, Pluralize(weaponCount, "weapon"), Pluralize(structureCount, "structure"), Pluralize(blipCount, "blip"), commandStationsOnTeams))
+        end
+    end
     
 end
 
@@ -525,24 +533,32 @@ function techIdStringToTechId(techIdString)
 end
 
 // Create structure, weapon, etc. near player
-function OnCommandCreate(client, techIdString)
+function OnCommandCreate(client, techIdString, number)
 
     if Shared.GetCheatsEnabled() then
     
         local techId = techIdStringToTechId(techIdString)
         
+        if (number == nil) then
+            number = 1
+        end
+        
         if techId ~= nil then
 
-            local player = client:GetControllingPlayer()        
-            local success, position = GetRandomSpaceForEntity(player:GetOrigin(), 2, 10, 2, 2)
-            
-            if success then
-            
-                CreateEntityForTeam(techId, position, player:GetTeamNumber(), player)
+            for i = 0, number do
 
-            else
-                Print("Create %s: Couldn't find space for entity", EnumToString(kTechId, techId))
-            end
+                local player = client:GetControllingPlayer()        
+                local success, position = GetRandomSpaceForEntity(player:GetOrigin(), 2, 10, 2, 2)
+                
+                if success then
+                
+                    CreateEntityForTeam(techId, position, player:GetTeamNumber(), player)
+
+                else
+                    Print("Create %s: Couldn't find space for entity", EnumToString(kTechId, techId))
+                end
+                
+           end
             
         else
             Print("Usage: create (techId name)")
@@ -591,6 +607,24 @@ function OnCommandGiveGameEffect(client, gameEffectString, durationString)
         
         player:AddStackableGameEffect(gameEffectString, duration, nil)
         Print("AddStackableGameEffect(%s, %s) (%d in effect)", gameEffectString, ToString(duration), player:GetStackableGameEffectCount(gameEffectString))
+        
+    end
+    
+end
+
+function OnCommandSetGameEffect(client, gameEffectString, trueFalseString)
+
+    if Shared.GetCheatsEnabled() then
+    
+        local player = client:GetControllingPlayer()          
+        local gameEffect = StringToEnum(kGameEffect, gameEffectString)
+        
+        local state = true
+        if trueFalseString and ((trueFalseString == "false") or (trueFalseString == "0")) then
+            state = false
+        end
+        
+        player:SetGameEffectMask(gameEffect, state)
         
     end
     
@@ -674,3 +708,4 @@ Event.Hook("Console_create",                OnCommandCreate)
 Event.Hook("Console_random_debug",          OnCommandRandomDebug)
 Event.Hook("Console_bacon",                 OnCommandDistressBeacon)
 Event.Hook("Console_givegameeffect",        OnCommandGiveGameEffect)
+Event.Hook("Console_setgameeffect",         OnCommandSetGameEffect)

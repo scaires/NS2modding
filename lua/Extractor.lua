@@ -60,8 +60,7 @@ function Extractor:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then
     
         local techButtons = {   kTechId.None, kTechId.None, kTechId.None, kTechId.None,  
-                                kTechId.None, kTechId.None, kTechId.None, kTechId.None, 
-                                kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle }
+                                kTechId.None, kTechId.None, kTechId.Recycle, kTechId.None }
         
         if (self:GetResearchingId() == kTechId.None) and (self:GetUpgradeLevel() < ResourceTower.kMaxUpgradeLevel) then
             techButtons[kMarineUpgradeButtonIndex] = kTechId.ExtractorUpgrade

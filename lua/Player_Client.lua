@@ -469,7 +469,6 @@ function PlayerUI_GetPlayerResources()
         return player:GetDisplayPlasma()
     end
     return 0
-end
 
 //TCBM player team carbon
 function PlayerUI_GetPlayerTeamCarbon()
@@ -517,22 +516,6 @@ function PlayerUI_GetPlayerMaxHealth()
 end
 
 function PlayerUI_GetPlayerArmor()
-    local player = Client.GetLocalPlayer()
-    if player then
-        return player:GetArmor()
-    end
-    return 0
-end
-
-function PlayerUI_GetPlayerPlasma()
-    local player = Client.GetLocalPlayer()
-    if player then
-        return player:GetArmor()
-    end
-    return 0
-end
-
-function PlayerUI_GetPlayerCarbon()
     local player = Client.GetLocalPlayer()
     if player then
         return player:GetArmor()
@@ -639,10 +622,13 @@ function Player:UpdateCrossHairText()
             updatedText = true
 
         // Add quickie damage feedback and structure status
-        elseif (entity:isa("Structure") or entity:isa("MAC") or entity:isa("Drifter") or entity:isa("MASC")) and entity:GetIsAlive() then
+        elseif (entity:isa("Structure") or entity:isa("MAC") or entity:isa("Drifter") or entity:isa("ARC")) and entity:GetIsAlive() then
         
             local techId = trace.entity:GetTechId()
             local statusText = string.format("(%.0f%%)", Clamp(math.ceil(trace.entity:GetHealthScalar() * 100), 0, 100))
+            if entity:isa("Structure") and not entity:GetIsBuilt() then
+                statusText = string.format("(%.0f%%)", Clamp(math.ceil(trace.entity:GetBuiltFraction() * 100), 0, 100))
+            end
 
             local secondaryText = ""
             if entity:isa("Structure") then
@@ -835,31 +821,28 @@ function Player:UpdatePowerPointLights()
     // Only get power nodes on client every so often for performance reasons
     local time = Shared.GetTime()
     
+    // Get power points that are relevant
+    local forceUpdate = false
+    
     if (self.timeOfLastPowerPoints == nil) or (time > (self.timeOfLastPowerPoints + 3)) then
     
         self.powerPoints = GetEntitiesIsa("PowerPoint")
         
         self.timeOfLastPowerPoints = time
         
+        // If a power node wasn't relevant and becomes relevant, we need to update lights
+        forceUpdate = true
+        
     end
     
     // Now update the lights every frame
     for index, powerPoint in ipairs(self.powerPoints) do
     
-        if powerPoint:GetIsAffectingLights() then
+        // But only update lights when necessary for performance reasons
+        if powerPoint:GetIsAffectingLights() or forceUpdate then
         
-            local powerPointId = powerPoint:GetId()
-            local lightList = self.powerPointLightList[powerPointId]
-            
-            if not lightList then   
-                lightList = GetLightsForPowerPoint(powerPoint)
-                self.powerPointLightList[powerPointId] = lightList
-            end
-            
-            for lightIndex, renderLight in ipairs(lightList) do
-                powerPoint:UpdatePoweredLight(renderLight)
-            end
-                
+            powerPoint:UpdatePoweredLights()
+        
         end
         
     end
@@ -1033,7 +1016,6 @@ function Player:OnInitLocalClient()
     
     self.powerPoints = {}
     self.timeOfLastPowerPoints = nil
-    self.powerPointLightList = {}
     
     // Set commander geometry visible
     Client.SetGroupIsVisible(kCommanderInvisibleGroupName, true)
@@ -1588,6 +1570,8 @@ function Player:OnUpdate(deltaTime)
     // Need to update pose parameters every frame to keep them smooth
     LiveScriptActor.OnUpdate(self, deltaTime)
     
+    self:UpdateUse(deltaTime)
+    
     if not Client.GetIsRunningPrediction() then
     
         local isLocal = (self == Client.GetLocalPlayer())
@@ -1597,6 +1581,8 @@ function Player:OnUpdate(deltaTime)
             self:UpdatePoseParameters(deltaTime)
             
         end
+        
+        GetEffectManager():TriggerQueuedEffects()
     
         self:UpdateClientEffects(deltaTime, isLocal)
     

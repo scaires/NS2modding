@@ -114,8 +114,7 @@ function InfantryPortal:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then
     
         local techButtons = {   kTechId.None, kTechId.None, kTechId.None, kTechId.None, 
-                                kTechId.None, kTechId.None, kTechId.None, kTechId.None, 
-                                kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle }
+                                kTechId.None, kTechId.None, kTechId.Recycle, kTechId.None }
 
         // Don't display if upgraded already        
         if self:GetTechId() ~= kTechId.InfantryPortalTransponder then

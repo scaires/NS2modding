@@ -18,6 +18,9 @@ if(Client) then
     Script.Load("lua/MarineCommander_Client.lua")
 end
 
+MarineCommander.kBuildEffect = PrecacheAsset("cinematics/marine/structures/spawn_building.cinematic")
+MarineCommander.kBuildBigEffect = PrecacheAsset("cinematics/marine/structures/spawn_building_big.cinematic")
+
 MarineCommander.kSentryFiringSoundName = PrecacheAsset("sound/ns2.fev/marine/voiceovers/commander/sentry_firing")
 MarineCommander.kSentryTakingDamageSoundName = PrecacheAsset("sound/ns2.fev/marine/voiceovers/commander/sentry_taking_damage")
 MarineCommander.kSoldierLostSoundName = PrecacheAsset("sound/ns2.fev/marine/voiceovers/commander/soldier_lost")
@@ -83,6 +86,45 @@ function MarineCommander:OnSelectionChanged()
         
     end
 
+end
+
+function MarineCommander:GetBuildEffect(techId)
+    return ConditionalValue(GetTechUpgradesFromTech(techId, kTechId.CommandStation), MarineCommander.kBuildBigEffect, MarineCommander.kBuildEffect)
+end
+
+// Top row always the same. Alien commander can override to replace. 
+function MarineCommander:GetTopRowTechButtons()
+    return { kTechId.BuildMenu, kTechId.AdvancedMenu, kTechId.AssistMenu, kTechId.SquadMenu }
+end
+
+function MarineCommander:GetSelectionRowsTechButtons(techId)
+
+    local techButtons = {}
+    
+    if(techId == kTechId.BuildMenu) then 
+    
+        techButtons = { kTechId.CommandStation, kTechId.Extractor, kTechId.InfantryPortal, kTechId.Armory,
+                        kTechId.Sentry, kTechId.None, kTechId.None, kTechId.RootMenu}
+                        
+    elseif(techId == kTechId.AdvancedMenu) then 
+    
+        techButtons = { kTechId.Observatory, kTechId.RoboticsFactory, kTechId.PrototypeLab, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu}
+        
+    elseif(techId == kTechId.AssistMenu) then 
+    
+        techButtons = { kTechId.AmmoPack, kTechId.MedPack, kTechId.None, kTechId.None,
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu}
+        
+    elseif(techId == kTechId.SquadMenu) then 
+    
+        techButtons = { kTechId.SelectRedSquad, kTechId.SelectBlueSquad, kTechId.SelectGreenSquad, kTechId.SelectYellowSquad,
+                        kTechId.SelectOrangeSquad, kTechId.None, kTechId.None, kTechId.RootMenu}
+
+    end
+    
+    return techButtons
+    
 end
 
 function MarineCommander:ProcessNumberKeysMove(input, newPosition)

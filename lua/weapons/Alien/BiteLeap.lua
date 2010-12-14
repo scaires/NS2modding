@@ -54,10 +54,6 @@ function BiteLeap:GetIconOffsetY(secondary)
     return kAbilityOffset.Bite
 end
 
-function BiteLeap:GetTechId()
-    return kTechId.Bite
-end
-
 function BiteLeap:GetRange()
     return BiteLeap.kRange
 end
@@ -70,6 +66,10 @@ function BiteLeap:GetIdleAnimation()
     return chooseWeightedEntry( BiteLeap.kAnimIdleTable )
 end
 
+function BiteLeap:GetCanIdle()
+    return false
+end
+
 function BiteLeap:OnTargetKilled(entity)
     Shared.PlaySound(player, BiteLeap.kKillSound)
 end
@@ -77,7 +77,7 @@ end
 function BiteLeap:PerformPrimaryAttack(player)
     
     // Play random animation, speeding it up if we're under effects of fury
-    player:SetViewAnimation( BiteLeap.kAnimAttackTable, nil, nil, 1/player:AdjustFuryFireDelay(1) )
+    player:SetViewAnimation( BiteLeap.kAnimAttackTable, nil, nil, kSkulkBiteSpeedScalar * 1/player:AdjustFuryFireDelay(1) )
     player:SetActivityEnd( player:AdjustFuryFireDelay(BiteLeap.kBiteDelay) )
 
     // Play the attack animation on the character.
@@ -98,7 +98,7 @@ function BiteLeap:PerformPrimaryAttack(player)
             // Play special bite hit sound depending on material
             local surface = GetSurfaceFromTrace(trace)
             if(surface ~= "") then
-                Shared.PlayWorldSound(self:GetParent(), string.format(BiteLeap.kHitMaterialSoundSpec, surface), nil, trace.endPoint)
+                Shared.PlayWorldSound(nil, string.format(BiteLeap.kHitMaterialSoundSpec, surface), nil, trace.endPoint)
             end
         end
         

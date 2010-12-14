@@ -81,21 +81,6 @@ function AlienTeam:Update(timePassed)
     
 end
 
-function AlienTeam:PerformAutoHeal()
-
-    for index, structure in ipairs(self.structures) do
-    
-        // Auto-heal structures too
-        if structure:GetHealth() < structure:GetMaxHealth() then
-        
-            structure:AddHealth(AlienTeam.kAutoHealRate)
-            
-        end
- 
-    end
-
-end
-
 function AlienTeam:UpdateAutoBuild(timePassed)
 
     PROFILE("AlienTeam:UpdateTeamAutoBuild")
@@ -126,19 +111,31 @@ function AlienTeam:UpdateTeamAutoHeal(timePassed)
     if self.timeOfLastAutoHeal == nil or (time > (self.timeOfLastAutoHeal + AlienTeam.kAutoHealInterval)) then
     
         // Heal all players by this amount
-        local players = self:GetPlayers()
+        local teamEnts = GetGamerules():GetEntities("LiveScriptActor", self:GetTeamNumber())
         
-        for index, player in ipairs(players) do
+        for index, entity in ipairs(teamEnts) do
         
-            if player:GetIsAlive() then
+            if entity:GetIsAlive() and (entity:isa("Alien") or entity:isa("Drifter")) then
             
-                player:AddHealth( player:GetMaxHealth() * AlienTeam.kAutoHealPercent )
+                // Entities always get at least 1 point back
+                local healthBack = math.max(entity:GetMaxHealth() * AlienTeam.kAutoHealPercent, 1)
+                entity:AddHealth(healthBack, true)
                 
             end
             
         end
         
         self.timeOfLastAutoHeal = time
+        
+    end
+    
+    // Auto-heal structures constantly
+    for index, structure in ipairs(self.structures) do
+    
+        // Cap it so eggs don't count up like 1-2% per second
+        local maxHealth = structure:GetMaxHealth() * kBalanceAutoHealMaxPercentPerSecond/100 * timePassed
+        local health = math.min(AlienTeam.kAutoHealRate * timePassed, maxHealth)
+        structure:AddHealth(health, false)
         
     end
     

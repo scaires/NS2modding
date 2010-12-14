@@ -67,10 +67,6 @@ function Embryo:OnDestroyClient()
     
 end
 
-function Embryo:GetTechId()
-    return kTechId.Embryo
-end
-
 function Embryo:GetMaxViewOffsetHeight()
     return .2
 end
@@ -144,6 +140,10 @@ if Server then
         
     end
     
+end
+
+function Embryo:GetCanDoDamage()
+    return false
 end
 
 Shared.LinkClassToMap("Embryo", Embryo.kMapName, networkVars)

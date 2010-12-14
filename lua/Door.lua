@@ -96,10 +96,6 @@ function Door:OnInit()
 
 end
 
-function Door:GetTechId()
-    return kTechId.Door
-end
-
 // Only hackable by marine commander
 function Door:PerformActivation(techId, position, commander)
 
@@ -203,8 +199,7 @@ function Door:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then   
     
         return  {   kTechId.DoorOpen, kTechId.DoorClose, kTechId.None, kTechId.None,
-                    kTechId.DoorLock, kTechId.DoorUnlock, kTechId.None, kTechId.None,
-                    kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+                    kTechId.DoorLock, kTechId.DoorUnlock, kTechId.None, kTechId.None }
                     
     end
     

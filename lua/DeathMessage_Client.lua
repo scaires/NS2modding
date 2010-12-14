@@ -67,19 +67,14 @@ function InitDeathMessages(player)
 end
 
 // Pass 1 for isPlayer if coming from a player (look it up from scoreboard data), otherwise it's a tech id
-function GetDeathMessageEntityName(isPlayer, entityId)
+function GetDeathMessageEntityName(isPlayer, clientIndex)
 
     local name = ""
 
     if isPlayer == 1 then
-        // Convert the entity Id to a client Id for the player.
-        local playerEntity = Shared.GetEntity(entityId)
-        if playerEntity then
-            local convertedClientIndex = playerEntity:GetClientIndex()
-            name = Scoreboard_GetPlayerData(convertedClientIndex, kScoreboardDataIndexName)
-        end
+        name = Scoreboard_GetPlayerData(clientIndex, kScoreboardDataIndexName)
     else
-        name = LookupTechData(entityId, kTechDataDisplayName)
+        name = LookupTechData(clientIndex, kTechDataDisplayName)
     end
     
     if not name then
@@ -90,10 +85,10 @@ function GetDeathMessageEntityName(isPlayer, entityId)
     
 end
 
-function AddDeathMessage(killerIsPlayer, killerId, killerTeamNumber, iconIndex, targetIsPlayer, targetId, targetTeamNumber)
+function AddDeathMessage(killerIsPlayer, killerIndex, killerTeamNumber, iconIndex, targetIsPlayer, targetIndex, targetTeamNumber)
 
-    local killerName = GetDeathMessageEntityName(killerIsPlayer, killerId)
-    local targetName = GetDeathMessageEntityName(targetIsPlayer, targetId)
+    local killerName = GetDeathMessageEntityName(killerIsPlayer, killerIndex)
+    local targetName = GetDeathMessageEntityName(targetIsPlayer, targetIndex)
     
     // Just display attacker and icon when we kill ourselves
     if killerName == targetName then

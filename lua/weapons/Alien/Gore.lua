@@ -60,10 +60,6 @@ function Gore:GetIdleAnimation()
     return chooseWeightedEntry( Gore.kAnimIdleTable )
 end
 
-function Gore:GetTechId()
-    return kTechId.Gore
-end
-
 function Gore:GetHUDSlot()
     return 1
 end
@@ -92,7 +88,7 @@ function Gore:PerformPrimaryAttack(player)
         // Play special hit sound depending on material
         local surface = GetSurfaceFromTrace(trace)
         if(surface ~= "") then
-            Shared.PlayWorldSound(self:GetParent(), string.format(Gore.kHitMaterialSoundSpec, surface), nil, trace.endPoint)
+            Shared.PlayWorldSound(nil, string.format(Gore.kHitMaterialSoundSpec, surface), nil, trace.endPoint)
         end
         
         if hitObject and hitObject:isa("Door") then

@@ -26,8 +26,6 @@ Skulk.kFootstepSoundLeftMetal = PrecacheAsset("sound/ns2.fev/materials/metal/sku
 Skulk.kFootstepSoundRightMetal = PrecacheAsset("sound/ns2.fev/materials/metal/skulk_step_right")
 Skulk.kMetalLayer = PrecacheAsset("sound/ns2.fev/materials/metal/skulk_layer")
 Skulk.kLandSound = PrecacheAsset("sound/ns2.fev/alien/skulk/land")
-Skulk.kWoundSound = PrecacheAsset("sound/ns2.fev/alien/skulk/wound")
-Skulk.kWoundSeriousSound = PrecacheAsset("sound/ns2.fev/alien/skulk/wound_serious")
 Skulk.kIdleSound = PrecacheAsset("sound/ns2.fev/alien/skulk/idle")
 
 if Server then
@@ -36,11 +34,12 @@ end
 
 local networkVars = 
 {
-    wallWalking                 = "boolean",
+    wallWalking                 = "compensated boolean",
     timeLastWallWalkCheck       = "float",
-    leaping                     = "boolean",
-    leapingAnimationPlaying     = "boolean",
-    wallWalkingNormal           = "vector"
+    leaping                     = "compensated boolean",
+    leapingAnimationPlaying     = "compensated boolean",
+    wallWalkingNormalGoal       = "compensated vector",
+    wallWalkingNormalCurrent    = "compensated vector"
 }
 
 // Balance, movement, animation
@@ -58,6 +57,8 @@ Skulk.kAcceleration = 200
 Skulk.kFov = 110
 Skulk.kMass = 45 // ~100 pounds
 Skulk.kWallWalkCheckInterval = .2
+// This is how quickly the 3rd person model will adjust to the new normal.
+Skulk.kWallWalkNormalSmoothRate = 5
 Skulk.kXExtents = .45
 Skulk.kYExtents = .45
 Skulk.kZExtents = .45
@@ -76,6 +77,9 @@ function Skulk:OnInit()
     Shared.PlaySound(self, Skulk.kIdleSound)
     
     self.wallWalking = false
+    self.wallWalkingNormalCurrent = Vector.yAxis
+    self.wallWalkingNormalGoal    = Vector.yAxis
+    
     self.leaping = false
     self.leapingAnimationPlaying = false
 
@@ -95,10 +99,6 @@ function Skulk:GetSpawnSound()
     return Skulk.kSpawnSoundName
 end
 
-function Skulk:GetTechId()
-    return kTechId.Skulk
-end
-
 function Skulk:GetMaxViewOffsetHeight()
     return Skulk.kViewOffsetHeight
 end
@@ -112,12 +112,14 @@ function Skulk:GetCrouchShrinkAmount()
     return 0
 end
 
-function Skulk:GetFlinchSound(damage)
-    return ConditionalValue(damage >= 20, Skulk.kWoundSeriousSound, Skulk.kWoundSound)
-end
-
 function Skulk:GetStartFov()
     return Skulk.kFov
+end
+
+// The Skulk movement should factor in the vertical velocity
+// only when wall walking.
+function Skulk:GetMoveSpeedIs2D()
+    return not self:GetIsWallWalking()
 end
 
 function Skulk:OnLeap()
@@ -256,26 +258,27 @@ function Skulk:PreUpdateMovePhysics(input, runningPrediction)
 
     PROFILE("Skulk:PreUpdateMovePhysics")
 
-    // Crouching turns off wallwalking like in NS
-    if self.crouching then
-        self.wallWalking = false
-    end
-
     local angles = Angles(self:GetAngles())
 
-    if (not self:GetRecentlyWallJumped() and not self.crouching) then
+    // Crouching turns off wallwalking like in NS
+    if self.crouching then
+    
+        self.wallWalking = false
+        
+    elseif (not self:GetRecentlyWallJumped() and not self.crouching) then
         
         // Don't check wall walking every frame for performance    
-        if self.timeLastWallWalkCheck == nil or (Shared.GetTime() > (self.timeLastWallWalkCheck + Skulk.kWallWalkCheckInterval)) then
+        if (Shared.GetTime() > (self.timeLastWallWalkCheck + Skulk.kWallWalkCheckInterval)) then
         
-            self.wallWalking = false
-            
             // Most of the time, it returns a fraction of 0, which means
             // trace started outside the world (and no normal is returned)           
-            self.wallWalkingNormal = self:GetAverageWallWalkingNormal()
+            local goal = self:GetAverageWallWalkingNormal()
             
-            if self.wallWalkingNormal ~= nil then
+            if goal ~= nil then
+                self.wallWalkingNormalGoal = goal
                 self.wallWalking = true
+            else
+                self.wallWalking = false
             end
             
             self.timeLastWallWalkCheck = Shared.GetTime()
@@ -284,37 +287,73 @@ function Skulk:PreUpdateMovePhysics(input, runningPrediction)
        
     end
     
-    if(self.leaping and (Alien.GetIsOnGround(self) or self.wallWalking) and (self.timeOfLeap == nil or (Shared.GetTime() > self.timeOfLeap + Skulk.kLeapTime))) then
+    if self.wallWalking == false then
+        // When not wall walking, the goal is always directly up (running on ground).
+        self.wallWalkingNormalGoal = Vector.yAxis
+    end
+    
+    if ( self.leaping and (Alien.GetIsOnGround(self) or self.wallWalking) and (Shared.GetTime() > self.timeOfLeap + Skulk.kLeapTime) ) then
         self.leaping = false
     end
-    
-    if (self.wallWalking == true) then
 
-        local yaxis = Vector(0.0, 1.0, 0.0)
-        local angle = math.acos(self.wallWalkingNormal:DotProduct(yaxis))
-        local offset = 0.0
-
-        // if we're upside down in the world, controls are reversed;
-        if (math.acos(self.wallWalkingNormal:DotProduct(yaxis * -1.0)) < (math.pi / 4.0)) then
-            offset = math.pi
-        end
-        
-        // build out the orientation;
-        local coords = Coords.GetRotation(self.wallWalkingNormal:CrossProduct(yaxis), -angle)
-       
-        local viewAngles = Angles(self:GetViewAngles())
-        angles:BuildFromCoords(coords * Coords.GetRotation(yaxis, offset + viewAngles.yaw))
-        
-    else
-    
-        angles = Angles(self:GetViewAngles())
-        angles.roll = 0.0
-        angles.pitch = 0.0
-        
+    // Smooth out the normal.
+    if self.wallWalkingNormalCurrent == nil then
+        self.wallWalkingNormalCurrent = Vector(Vector.yAxis)
     end
+    local normalDiff = self.wallWalkingNormalGoal - self.wallWalkingNormalCurrent
+    self.wallWalkingNormalCurrent = self.wallWalkingNormalCurrent + (normalDiff * (input.time * Skulk.kWallWalkNormalSmoothRate))
+    self.wallWalkingNormalCurrent:Normalize()
+    
+    // Build out the orientation.
+    
+    local viewCoords = self:GetViewCoords()
+    local coords     = Coords()
+    
+    coords.yAxis = self.wallWalkingNormalCurrent
+    
+    // Try to align the forward direction with our view forward direction
+    coords.zAxis = viewCoords.zAxis
+
+    coords.xAxis = coords.yAxis:CrossProduct( coords.zAxis )
+    if (coords.xAxis:Normalize() == 0) then
+        // We have to choose the x-axis arbitrarily since we're
+        // looking along the normal direction.
+        coords.xAxis = coords.yAxis:GetPerpendicular()
+    end
+    
+    coords.zAxis = coords.xAxis:CrossProduct( coords.yAxis )
+    angles:BuildFromCoords(coords)
     
     self:SetAngles(angles)
     
+    // Make sure the Skulk isn't intersecting with any geometry.
+    if self.wallWalking == true then
+        self:PreventWallWalkIntersection(input.time)
+    end
+    
+end
+
+function Skulk:PreventWallWalkIntersection(dt)
+    
+    PROFILE("Skulk:PreventWallWalkIntersection")
+    
+    // Try moving skulk in a few different directions until we're not intersecting.
+    local intersectDirections = { self:GetCoords().xAxis,
+                                  -self:GetCoords().xAxis,
+                                  self:GetCoords().zAxis,
+                                  -self:GetCoords().zAxis }
+    
+    local originChanged = 0
+    for index, direction in ipairs(intersectDirections) do
+    
+        local extentsDirection = self:GetExtents():GetLength() * 0.75 * direction
+        local trace = Shared.TraceRay(self:GetOrigin(), self:GetOrigin() + extentsDirection, self:GetMovePhysicsMask(), EntityFilterOne(self))
+        if trace.fraction < 1 then
+            self:PerformMovement((-extentsDirection * dt * 5 * (1 - trace.fraction)), 3)
+        end
+
+    end
+
 end
 
 function Skulk:UpdateCrouch()
@@ -330,7 +369,7 @@ function Skulk:AdjustModelCoords(modelCoords)
         local angles = self:GetAngles()
         // The addOffset to is take into account the extra offset when upside down
         local addOffset = (math.abs(angles.roll) - (math.pi / 2)) / math.pi
-        modelCoords.origin = modelCoords.origin + Vector(self.wallWalkingNormal * -(offset + addOffset))
+        modelCoords.origin = modelCoords.origin + Vector(self.wallWalkingNormalCurrent * -(offset + addOffset))
     end
     
 end
@@ -410,6 +449,14 @@ function Skulk:GetAverageWallWalkingNormal()
     
     if (numNormals > 0) then
     
+        // Check if the Skulk is right above a surface it can stand on.
+        // Even if the Skulk is in "wall walking mode", we want it to look
+        // like it is standing on a surface if it is right above it.
+        local groundTrace = Shared.TraceRay(startPoint, startPoint + Vector(0, -wallWalkingRange, 0), PhysicsMask.AllButPCs, EntityFilterOne(self))
+        if (groundTrace.fraction > 0 and groundTrace.fraction < 1 and groundTrace.entity == nil) then
+            return groundTrace.normal
+        end
+        
         local average = Vector(0, 0, 0)
     
         for i,currentNormal in ipairs(wallNormals) do
@@ -471,15 +518,6 @@ end
 function Skulk:GetMoveDirection(moveVelocity)
 
     // Don't constrain movement to XZ so we can walk smoothly up walls
-    if self:GetIsWallWalking() then
-        return GetNormalizedVector(moveVelocity)
-    end
-    
-    return Alien.GetMoveDirection(self, moveVelocity)
-end
-
-function Skulk:GetMoveDirection(moveVelocity)
-
     if self:GetIsWallWalking() then
         return GetNormalizedVector(moveVelocity)
     end

@@ -394,13 +394,12 @@ end
 function MASC:GetTechButtons(techId)
     if(techId == kTechId.RootMenu and not self.deploying and not self.undeploying) then
         if(self.deployed) then
-            return  {   kTechId.MASCUndeploy, kTechId.None, kTechId.None, kTechId.None,
-                        kTechId.None, kTechId.Attack, kTechId.Stop, kTechId.None,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle }
+            return  {   kTechId.Attack, kTechId.Stop, kTechId.Move, kTechId.None,
+                        kTechId.MASCUndeploy, kTechId.None, kTechId.None, kTechId.Recycle }
         else
-            return  {   kTechId.MASCDeploy, kTechId.None, kTechId.None, kTechId.None,
-                        kTechId.Move, kTechId.Attack, kTechId.Stop, kTechId.None,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.Recycle  }
+            return  {   
+                        kTechId.Attack, kTechId.Stop, kTechId.Move, kTechId.None,
+                        kTechId.MASCDeploy, kTechId.None, kTechId.Recycle, kTechId.None }
         end
     else
         return nil

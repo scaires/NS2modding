@@ -33,6 +33,8 @@ end
 // once per frame and store them if needed.
 function GetEntitiesIsa(isaName, teamNumber, silent)
 
+    PROFILE("GetEntitiesIsa")
+    
     //if not silent then
     //    Print("GetEntitiesIsa(%s) - %.2f", isaName, Shared.GetTime())
     //end
@@ -273,13 +275,43 @@ function GetEntitiesIsaInRadius(className, teamNumber, origin, radius, checkXZOn
         
 end
 
-//TCBM: Radiusdamage is nonlinear and checks for occlusion
-// Fades damage non-linearly (squared) from center point to radius (0 at far end of radius)
+// Fades damage linearly from center point to radius (0 at far end of radius)
 function RadiusDamage(entities, centerOrigin, radius, fullDamage, attacker)
 
     // Do damage to every target in range
     for index, target in ipairs(entities) do
-		local trace = TraceToExtents(centerOrigin,target,attacker)
+    
+        local damageDirection = target:GetOrigin() - centerOrigin
+        damageDirection:Normalize()
+        
+        // Damage falloff
+        local distanceFromTarget = (centerOrigin - target:GetOrigin()):GetLength()
+        local damageScalar = 1 - math.min(math.max(0, distanceFromTarget/radius), 1)
+        local damage = fullDamage*damageScalar
+        
+        // Trace line to each target to make sure it's not blocked by a wall 
+        local targetOrigin = target:GetModelOrigin()
+        if target.GetEngagementPoint then
+            targetOrigin = target:GetEngagementPoint()
+        end
+        
+        if not GetWallBetween(centerOrigin, targetOrigin, attacker) then
+        
+            target:TakeDamage(damage, attacker, attacker, target:GetOrigin(), damageDirection)
+
+        end
+        
+    end
+    
+end
+
+//TCBM: Radiusdamage is nonlinear and checks for occlusion
+// Fades damage non-linearly (squared) from center point to radius (0 at far end of radius)
+function TCBMRadiusDamage(entities, centerOrigin, radius, fullDamage, attacker, filter)
+
+    // Do damage to every target in range
+    for index, target in ipairs(entities) do
+		local trace = TraceToExtents(centerOrigin,target,filter)
 		
 		if trace ~= nil then
 			local damageDirection = trace.endPoint - centerOrigin
@@ -287,11 +319,15 @@ function RadiusDamage(entities, centerOrigin, radius, fullDamage, attacker)
 			// Damage falloff
 			local distanceFromTarget = (centerOrigin - trace.endPoint):GetLength()
 			//nonlinear damage falloff
-			local damageScalar = math.min(math.max(0, ((radius - distanceFromTarget)*(radius-distanceFromTarget))/(radius*radius)), 1)
-			local damage = fullDamage*damageScalar
-			
-			//Print("RadiusDamage - %s:TakeDamage: %s, %s (dist: %.2f, damageScalar: %.2f, damage: %.2f) index %d", target:GetMapName(), attacker:GetMapName(), tostring(damage), distanceFromTarget, damageScalar, damage,index)
-			target:TakeDamage(damage, attacker, attacker, trace.endPoint, damageDirection)
+			if distanceFromTarget < radius then
+				local damageScalar = math.min(math.max(0, ((radius - distanceFromTarget)*(radius-distanceFromTarget))/(radius*radius)), 1)
+				local damage = fullDamage*damageScalar
+				
+				if damage > 1 then
+					Print("RadiusDamage - %s:TakeDamage: %s, %s (dist: %.2f, damageScalar: %.2f, damage: %.2f) index %d", target:GetMapName(), attacker:GetMapName(), tostring(damage), distanceFromTarget, damageScalar, damage,index)
+					target:TakeDamage(damage, attacker, attacker, trace.endPoint, damageDirection)
+				end
+			end
 		end
 		
     end

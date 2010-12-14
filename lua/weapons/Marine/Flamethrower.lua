@@ -28,6 +28,7 @@ Flamethrower.kBurnBigCinematic = PrecacheAsset("cinematics/marine/flamethrower/b
 Flamethrower.kBurnHugeCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_huge.cinematic")
 Flamethrower.kBurnMedCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_med.cinematic")
 Flamethrower.kBurnSmallCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_small.cinematic")
+Flamethrower.kBurn1PCinematic = PrecacheAsset("cinematics/marine/flamethrower/burn_1p.cinematic")
 Flamethrower.kFlameCinematic = PrecacheAsset("cinematics/marine/flamethrower/flame.cinematic")
 Flamethrower.kFlameFirstPersonCinematic = PrecacheAsset("cinematics/marine/flamethrower/flame_1p.cinematic")
 Flamethrower.kFlameoutCinematic = PrecacheAsset("cinematics/marine/flamethrower/flameout.cinematic")
@@ -128,7 +129,30 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
     local ents = GetGamerules():GetEntities("LiveScriptActor", -1, barrelPoint, range)
     
     local fireDirection = player:GetViewAngles():GetCoords().zAxis
-    
+
+	local endPoint = barrelPoint + fireDirection * range
+	local trace = Shared.TraceRay(barrelPoint, endPoint, PhysicsMask.Bullets, EntityFilterTwo(self,player))
+	
+	if trace.fraction < 1 then
+		Shared.CreateEffect(nil, Flamethrower.kImpactCinematic, nil, Coords.GetTranslation(trace.endPoint))
+		// Do damage to targets
+		local hitEntities = GetGamerules():GetEntities("LiveScriptActor", GetEnemyTeamNumber(self:GetTeamNumber()), trace.endPoint, (Flamethrower.kRange)/3)
+
+		//local distToPlayer = (trace.endPoint - player:GetModelOrigin()):GetLength()
+		
+		//if distToPlayer < ((Flamethrower.kRange)/2) then
+		//	player:TakeDamage(Flamethrower.kDamage*(distToPlayer/((Flamethrower.kRange)/2)), player, self, player:GetModelOrigin(), -fireDirection)
+		//end
+		
+		//damage player too
+		table.insertunique(hitEntities, player)
+		RadiusDamage(hitEntities, trace.endPoint, (Flamethrower.kRange)/2, Flamethrower.kDamage, player, EntityFilterOne(nil))
+		
+		//for index, ent in ipairs(hitEntities) do
+		//	table.insertunique(ents,ent)
+		//end
+	end
+	
     for index, ent in ipairs(ents) do
     
         if ent ~= player then
@@ -137,10 +161,10 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
             local dotProduct = fireDirection:DotProduct(toEnemy)
         
             // Look for enemies in cone in front of us    
-            if dotProduct > .9 then
+            if dotProduct > .975 then
 				
-				local trace = TraceToExtents(barrelPoint,ent,player)
-
+				local trace = TraceToExtents(barrelPoint,ent,EntityFilterOne(player))
+				
 				if trace ~= nil then
 					// Do damage to them and catch them on fire
 					ent:TakeDamage(Flamethrower.kDamage, player, self, ent:GetModelOrigin(), toEnemy)
@@ -153,7 +177,7 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
 							//Print("Set on fire!")
 							// Play on fire cinematic
 							Shared.CreateEffect(nil, GetOnFireCinematic(ent), ent, Coords.GetIdentity())
-							Shared.CreateEffect(nil, Flamethrower.kImpactCinematic, ent, Coords.GetIdentity())
+							
 						//end
 					end
 					
@@ -167,9 +191,6 @@ function Flamethrower:FirePrimary(player, bullets, range, penetration)
     
 end
 
-function Flamethrower:GetTechId()
-    return kTechId.Flamethrower
-end
 
 function Flamethrower:GetDeathIconIndex()
     return kDeathMessageIcon.Flamethrower

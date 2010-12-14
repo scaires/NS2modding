@@ -120,10 +120,6 @@ function Marine:OnCreate()
     
 end
 
-function Marine:GetTechId()
-    return kTechId.Marine
-end
-
 function Marine:OnInit()
     
     Player.OnInit(self)
@@ -418,26 +414,6 @@ function Marine:UpdateSprintingState(input)
     
 end
 
-function Marine:GetFlinchAnimation(damage)
-
-    local activeWeapon = self:GetActiveWeapon()
-    
-    // No flinch_big just flinch (ie, rifle_flinch)
-    if activeWeapon ~= nil then
-        return string.format("%s_%s", activeWeapon:GetMapName(), LiveScriptActor.kAnimFlinch)
-    end
-    
-    return ""
-    
-end
-
-function Marine:GetFlinchEffect(damage)
-    if damage > BiteLeap.kDamage then
-        return Marine.kFlinchBigEffect
-    end
-    return Marine.kFlinchEffect
-end
-
 function Marine:GetCanViewModelIdle()
     return self:GetIsAlive() and not self.sprinting
 end
@@ -718,9 +694,8 @@ function Marine:GetTechButtons(techId)
     if(techId == kTechId.RootMenu) then 
 
         // Show orders     
-        techButtons = { kTechId.SquadSeekAndDestroy, kTechId.SquadHarass, kTechId.SquadRegroup, kTechId.None,
-                        kTechId.SquadMove, kTechId.SquadAttack, kTechId.SquadDefend, kTechId.None,
-                        kTechId.None, kTechId.None, kTechId.None, kTechId.None}
+        techButtons = { kTechId.SquadAttack, kTechId.SquadMove, kTechId.SquadDefend, kTechId.None,
+                        kTechId.SquadSeekAndDestroy, kTechId.SquadHarass, kTechId.SquadRegroup, kTechId.None }
         
     end
     

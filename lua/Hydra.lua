@@ -75,4 +75,9 @@ function Hydra:GetIdleAnimation()
     
 end
 
+function Hydra:GetCanDoDamage()
+    return true
+end
+
+
 Shared.LinkClassToMap("Hydra", Hydra.kMapName, {})

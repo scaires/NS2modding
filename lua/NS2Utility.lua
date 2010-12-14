@@ -256,15 +256,14 @@ function ReplicateStructure(techId, position, commander)
         if newEnt ~= nil then
         
             // Create replicate effect at source and destination
-            local replicateEffect = CommandStation.kMarineReplicateEffect
+            local replicateEffect = MarineCommander.kBuildEffect
             if GetTechUpgradesFromTech(srcStructure:GetTechId(), kTechId.CommandStation) then
-                replicateEffect = CommandStation.kMarineReplicateBigEffect
+                replicateEffect = MarineCommander.kBuildBigEffect
             end
             
             Shared.CreateEffect(nil, replicateEffect, srcStructure, nil)
             Shared.CreateEffect(nil, replicateEffect, newEnt, nil)
             
-			//TCBM: Don't complete replicate construction (Currently disabled, so replicating is still possible)
             // Set construction complete
             newEnt:SetConstructionComplete()
             
@@ -324,6 +323,36 @@ function GetSurfaceFromTrace(trace)
     end
 
     return trace.surface
+    
+end
+
+// Trace line to each target to make sure it's not blocked by a wall 
+function GetWallBetween(startPoint, endPoint, ignoreEntity)
+
+    local currentStart = Vector()
+    VectorCopy(startPoint, currentStart)
+    
+    local filter = EntityFilterOne(ignoreEntity)
+
+    // Don't trace too much 
+    for i = 0, 10 do
+    
+        local trace = Shared.TraceRay(currentStart, endPoint, PhysicsMask.Bullets, filter)
+        
+        // Not blocked by entities, only world geometry
+        if trace.fraction == 1 then
+            return false
+        elseif not trace.entity then
+            return true
+        else
+            filter = EntityFilterTwo(ignoreEntity, trace.entity)
+        end
+        
+        VectorCopy(trace.endPoint, currentStart)
+        
+    end
+    
+    return false
     
 end
 
@@ -459,7 +488,7 @@ function GetIsBuildPickVecLegal(techId, player, pickVec, snapRadius)
 end
 
 //TCBM: traces to extents of a unit box
-function TraceToExtents(origin, target,actor)
+function TraceToExtents(origin, target,filter)
 	local tgtCenter = target:GetOrigin()
 	local extents = target:GetExtents()
 	local targets = {
@@ -476,11 +505,11 @@ function TraceToExtents(origin, target,actor)
 	local bestDistance = 10000
 	
 	for index, targetPoint in ipairs(targets) do
-		local trace = Shared.TraceRay(origin, targetPoint, PhysicsMask.AllButPCs, EntityFilterOne(actor))
+		local trace = Shared.TraceRay(origin, targetPoint, PhysicsMask.AllButPCs, filter)
 
 		if (trace.fraction < 1) then
 								   
-			if trace.entity and trace.entity.TakeDamage then
+			if trace.entity and trace.entity == target and trace.entity.TakeDamage then
 				
 				local distanceFromTarget = (origin - trace.endPoint):GetLength()
 				
@@ -896,7 +925,10 @@ function SetPlayerPoseParameters(player, viewAngles, velocity, maxSpeed, maxBack
     local viewCoords = viewAngles:GetCoords()
     
     local horizontalVelocity = Vector(velocity)
-    horizontalVelocity.y = 0
+    // Not all players will contrain their movement to the X/Z plane only.
+    if player:GetMoveSpeedIs2D() then
+        horizontalVelocity.y = 0
+    end
     
     local x = Math.DotProduct(viewCoords.xAxis, horizontalVelocity)
     local z = Math.DotProduct(viewCoords.zAxis, horizontalVelocity)
@@ -936,20 +968,20 @@ function GetHasRoomForCapsule(extents, position, physicsMask, ignoreEntity)
 
 end
 
-function GetOnFireCinematic(ent)
+function GetOnFireCinematic(ent, firstPerson)
 
     local className = ent:GetClassName()
     
-    if className == "Hive" or className == "CommandStation" then
+    if firstPerson then
+        return Flamethrower.kBurn1PCinematic
+    elseif className == "Hive" or className == "CommandStation" then
         return Flamethrower.kBurnHugeCinematic
-    elseif className == "MAC" or className == "Drifter" or className == "Sentry"  or className == "Hydra" then
+    elseif className == "MAC" or className == "Drifter" or className == "Sentry" or className == "Egg" or className == "Embryo" then
         return Flamethrower.kBurnSmallCinematic
     elseif className == "Onos" then
         return Flamethrower.kBurnBigCinematic
-	//TCBM: Aliens have "small" burn cinematic to obscure vision less    
-	elseif ent:isa("Alien") then
-		return Flamethrower.kBurnSmallCinematic
-	end
+    end
+    
     return Flamethrower.kBurnMedCinematic
     
 end

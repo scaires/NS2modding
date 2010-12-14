@@ -22,8 +22,6 @@ CommandStation.kReplicateSound = PrecacheAsset("sound/ns2.fev/alien/common/join_
 
 CommandStation.kCommandScreenEffect = PrecacheAsset("cinematics/marine/commandstation/command_screen.cinematic")
 CommandStation.kDeathEffect = PrecacheAsset("cinematics/marine/commandstation/death.cinematic")
-CommandStation.kMarineReplicateEffect = PrecacheAsset("cinematics/marine/clone_structure.cinematic")
-CommandStation.kMarineReplicateBigEffect = PrecacheAsset("cinematics/marine/clone_structure_big.cinematic")
 
 CommandStation.kLoginAttachPoint = "login"
 
@@ -90,10 +88,9 @@ function CommandStation:GetTechButtons(techId)
     
     if(techId == kTechId.RootMenu) then 
     
-        techButtons = { kTechId.MAC, kTechId.AmmoPack, kTechId.MedPack, kTechId.CatPack,
-                        kTechId.SetRally, kTechId.None, kTechId.None, kTechId.None,
-                        kTechId.None, kTechId.CommandStationUpgradesMenu, kTechId.ReplicateMenu, kTechId.None}
-        
+        techButtons = { kTechId.MAC, kTechId.None, kTechId.None, kTechId.None, 
+                        kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+
         // Allow command station to be upgraded, but you'll never upgrade it to Level1 so don't show it
         if(self:GetTechId() == kTechId.CommandStation) then
             techButtons[kMarineUpgradeButtonIndex] = self:GetLevelTechId(2)
@@ -101,109 +98,31 @@ function CommandStation:GetTechButtons(techId)
             techButtons[kMarineUpgradeButtonIndex] = self:GetLevelTechId(3)
         end
         
-        // Don't allow recycling of structure when occupied!
-        if not self:GetIsOccupied() then
-            techButtons[kRecycleButtonIndex] = kTechId.Recycle
-        end
-        
-    elseif techId == kTechId.ReplicateMenu then
-    
-        techButtons = {     kTechId.ReplicateCommandStation, kTechId.ReplicateExtractor, kTechId.ReplicateInfantryPortal, kTechId.ReplicateArmory, 
-                            kTechId.ReplicateSentry, kTechId.ReplicateObservatory, kTechId.ReplicateRoboticsFactory, kTechId.None,
-                            kTechId.ReplicateMAC, kTechId.ReplicateMASC, kTechId.None, kTechId.RootMenu }
-                            
-    elseif techId == kTechId.CommandStationUpgradesMenu then
-    
-        techButtons = {     kTechId.ReplicateTech, kTechId.SentryTech, kTechId.None, kTechId.None, 
-                            kTechId.MACMinesTech, kTechId.MACEMPTech, kTechId.MACSpeedTech, kTechId.None,
-                            kTechId.None, kTechId.None, kTechId.None, kTechId.RootMenu  }
-
     end
     
+    // Don't allow recycling of structure when occupied!
+    if not self:GetIsOccupied() then
+        techButtons[kRecycleButtonIndex] = kTechId.Recycle
+    end
+
     return techButtons
  
-end
-
-function CommandStation:PerformActivation(techId, position, commander)
-
-    local success = false
-    
-    for index, techButtonId in ipairs(self:GetTechButtons(kTechId.ReplicateMenu)) do
-
-        if (techId == techButtonId) and (techId ~= kTechId.None) then    
-        
-            // Check if we have enough carbon to replicate this structure
-            local structureId = LookupTechData(techId, kTechDataReplicateTechId)
-            //TCBM: Use replicate cost (techid) instead of normal cost (structureid)
-			local cost = LookupTechData(techId, kTechDataCostKey)
-            local costsCarbon = commander:GetTechTree():GetTechNode(structureId):GetIsBuild()
-            
-            if (costsCarbon and (commander:GetTeam():GetCarbon() >= cost)) or (commander:GetPlasma() >= cost) then
-            
-                if ReplicateStructure(structureId, position, commander) then
-                
-                    if costsCarbon then
-                        commander:GetTeam():AddCarbon(-cost)
-                    else
-                        commander:GetTeam():AddPlasma(-cost)
-                    end
-
-                    success = true
-                    
-                end
-                    
-            else
-            
-                // Play "require more resources" sound
-                commander:TriggerNotEnoughResourcesAlert()
-                
-            end
-            
-            break
-            
-        end
-        
-    end
-    
-    if not success then
-        success = LiveScriptActor.PerformActivation(self, techId, position, commander)
-    end
-    
-    return success
-    
 end
 
 function CommandStation:GetDeathAnimation()
     return ConditionalValue(self.occupied, "death_closed", "death_opened")
 end
 
-function CommandStation:GetEngagementPoint()
-    if not self.occupied then
-        return self:GetOrigin()
-    else
-        return CommandStructure.GetEngagementPoint(self)
-    end
-end
-
-Shared.LinkClassToMap("CommandStation",    CommandStation.kMapName, networkVars)
 Shared.LinkClassToMap("CommandStation",    CommandStation.kLevel1MapName, networkVars)
 
 // Create new classes here so L2 and L3 command stations can be created for test cases without
 // create a basic hive and then upgrading it
 class 'CommandStationL2' (CommandStation)
 
-function CommandStationL2:GetTechId()
-    return kTechId.CommandFacility
-end
-
 CommandStationL2.kMapName       = "commandstationl2"
 Shared.LinkClassToMap("CommandStationL2", CommandStationL2.kMapName, {})
 
 class 'CommandStationL3' (CommandStationL2)
-
-function CommandStationL3:GetTechId()
-    return kTechId.CommandCenter
-end
 
 CommandStationL3.kMapName       = "commandstationl3"
 Shared.LinkClassToMap("CommandStationL3", CommandStationL3.kMapName, {})

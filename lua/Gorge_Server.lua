@@ -59,7 +59,7 @@ function Gorge:AttemptToBuy(techId)
         
             hydra:SetOwner(self)
 
-            self:DeductPlasma(LookupTechData(techId, kTechDataCostKey))
+            self:AddPlasma(-LookupTechData(techId, kTechDataCostKey))
                     
             self:PlaySound(self:GetPlaceBuildingSound())
             

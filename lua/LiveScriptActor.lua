@@ -5,7 +5,7 @@
 //    Created by:   Charlie Cleveland (charlie@unknownworlds.com)
 //
 // Base class for all "live" entities. They have health and/or armor, can take damage, be killed 
-// and can be given orders. Players, Drifters, MACs, MASCs, etc. Only objects of this type 
+// and can be given orders. Players, Drifters, MACs, ARCs, etc. Only objects of this type 
 // are used for selection by the Commander.
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
@@ -28,6 +28,7 @@ LiveScriptActor.kAnimFlinchBig = "flinch_big"
 // On fire sounds
 LiveScriptActor.kOnFireSmallSound = PrecacheAsset("sound/ns2.fev/common/fire_small")
 LiveScriptActor.kOnFireLargeSound = PrecacheAsset("sound/ns2.fev/common/fire_large")
+LiveScriptActor.kAlienRegenerationSound = PrecacheAsset("sound/ns2.fev/alien/common/regeneration")
 
 // Takes this much time to reduce flinch completely
 LiveScriptActor.kFlinchIntensityReduceRate = .4
@@ -57,7 +58,7 @@ local networkVars =
     maxArmor                = "float",
     
     // Used for limiting frequency of abilities
-    energy                  = string.format("integer (0 to %s)", LiveScriptActor.kMaxEnergy),
+    energy                  = "float",
     maxEnergy               = string.format("integer (0 to %s)", LiveScriptActor.kMaxEnergy),
 
     // 0 to 1 value indicating how much pain we're in
@@ -184,6 +185,10 @@ function LiveScriptActor:OnInit()
     // Ability to turn off pathing for testing
     self.pathingEnabled = true
     
+    if Server then
+        self:TriggerEffects("spawn")
+    end
+    
 end
 
 // All children should override this
@@ -249,6 +254,11 @@ function LiveScriptActor:GetCanNewActivityStart()
     if(self.activityEnd == 0 or (Shared.GetTime() > self.activityEnd)) then
         return true
     end
+    return false
+end
+
+// Used for sentries/hydras to figure out what to attack first
+function LiveScriptActor:GetCanDoDamage()
     return false
 end
 
@@ -427,11 +437,10 @@ function LiveScriptActor:OnUpdate(deltaTime)
     
     if self.timeLastUpdate ~= nil then
 
-        if Server then    
-        self:ApplyQueuedFlinchAnimation()
-        end
-        
         // Update flinch intensity
+        if self.flinchIntensity == nil then
+            Shared.Message("self.flinchIntensity is nil! class name: " .. self:GetClassName())
+        end
         self.flinchIntensity = Clamp(self.flinchIntensity - deltaTime*LiveScriptActor.kFlinchIntensityReduceRate, 0, 1)
         
         // Stop overlaying basic looping flinch animation when not needed
@@ -480,22 +489,6 @@ end
 
 function LiveScriptActor:GetPointValue()
     return LookupTechData(self:GetTechId(), kTechDataPointValue, LiveScriptActor.kDefaultPointValue)
-end
-
-function LiveScriptActor:GetFlinchAnimation(damage)
-    return LiveScriptActor.kAnimFlinch
-end
-
-function LiveScriptActor:GetFlinchFlamesAnimation(damage)
-    return LiveScriptActor.kAnimFlinchFlames
-end
-
-function LiveScriptActor:GetFlinchSound(damage)
-    return nil
-end
-
-function LiveScriptActor:GetFlinchEffect(damage)
-    return nil
 end
 
 // If the gamerules indicate it's OK an entity to take damage, it calls this. World objects or those without

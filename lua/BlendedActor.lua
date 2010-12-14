@@ -28,6 +28,11 @@ local networkVars =
     nextIdleTime                = "float", 
 }
 
+
+// Temporary used in BlendedActor:BlendAnimation to reduce the amount of
+// allocation/garbage created.
+local g_poses = PosesArray()
+
 // Called right after an entity is created on the client or server. This happens through Server.CreateEntity, 
 // or when a server-created object is propagated to client. 
 function BlendedActor:OnCreate()    
@@ -166,9 +171,15 @@ function BlendedActor:SetAnimationWithBlending(baseAnimationName, blendTime, for
 
     // If we have no animation or are already playing this animation, don't blend
     if(theCurrentAnimName ~= nil and theCurrentAnimName ~= animationName) then    
+    
         self.prevAnimationSequence = self:GetAnimationIndex(theCurrentAnimName)
         self.prevAnimationStart    = self.animationStart
         self.blendTime             = blendTime
+        
+        if self.GetClassName and self:GetClassName() == gActorAnimDebugClass then
+            Print("%s:SetAnimationWithBlending(%s, %.2f, %s, %s) (next SetAnimation is from this one)", self:GetClassName(), ToString(theCurrentAnimName), blendTime, ToString(force), ToString(speed))
+        end
+
     else
         self.prevAnimationSequence = Model.invalidSequence
         self.prevAnimationStart = 0
@@ -272,9 +283,9 @@ end
 /**
  * Called by the engine to construct the pose of the bones for the actor's model.
  */
-function BlendedActor:BuildPose(poses)
+function BlendedActor:BuildPose(model, poses)
     
-    Actor.BuildPose(self, poses)
+    Actor.BuildPose(self, model, poses)
 
     // If we have a previous animation, blend it in.
     if (self.prevAnimationSequence ~= Model.invalidSequence) then
@@ -285,7 +296,12 @@ function BlendedActor:BuildPose(poses)
             local fraction = Clamp( (time - self.animationStart) / self.blendTime, 0, 1 )
             
             if (fraction < 1) then
-                self:BlendAnimation(poses, self.prevAnimationSequence, self.prevAnimationStart, 1 - fraction)
+            
+                if self.GetClassName and self:GetClassName() == gActorAnimDebugClass then
+                    Print("%s:BuildPose(): fraction: %.2f", self:GetClassName(), fraction)
+                end
+                
+                self:BlendAnimation(model, poses, self.prevAnimationSequence, self.prevAnimationStart, 1 - fraction)
             end
             
         end
@@ -294,8 +310,22 @@ function BlendedActor:BuildPose(poses)
 
     // Apply the overlay animation if we have one.
     if (self.overlayAnimationSequence ~= Model.invalidSequence) then
-        self:AccumulateAnimation(poses, self.overlayAnimationSequence, self.overlayAnimationStart)
+        self:AccumulateAnimation(model, poses, self.overlayAnimationSequence, self.overlayAnimationStart)
     end
+    
+end
+
+/**
+ * Blends an animation over the existing pose by the indicated fraction (0 to 1).
+ */
+function BlendedActor:BlendAnimation(model, poses, animationIndex, animationStart, fraction)
+   
+    local animationTime = (Shared.GetTime() - animationStart) * self.animationSpeed
+
+    model:GetReferencePose(g_poses)
+    model:AccumulateSequence(animationIndex, animationTime, self.poseParams, g_poses)
+
+    Model.GetBlendedPoses(poses, g_poses, fraction)
     
 end
 

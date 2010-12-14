@@ -32,6 +32,16 @@ function Player:GetIsVirtual()
     
 end
 
+function Player:OnReset()
+
+    LiveScriptActor.OnReset(self)
+    
+    self.score = 0
+    self.kills = 0
+    self.deaths = 0
+
+end
+
 /**
  * Called when the player entity is destroyed.
  */
@@ -112,7 +122,7 @@ function Player:OnTeamChange(newTeamNumber)
     if(newTeamNumber ~= self:GetTeamNumber()) then
 
         // Remove from the old team, if non-nil
-        if(self:GetTeamNumber() ~= nil) then
+        if(self:GetTeamNumber() ~= -1) then
             
             self:RemoveChildren()
         
@@ -166,12 +176,6 @@ function Player:OnTakeDamage(damage, doer, point)
 
     LiveScriptActor.OnTakeDamage(self, damage, doer, point)
     
-    // Play hurt sound
-    local flinchSound = self:GetFlinchSound(damage)
-    if(flinchSound ~= nil) then
-        self:PlaySound(flinchSound)
-    end
-    
     // Play damage indicator for player
     if point ~= nil then
         Server.SendNetworkMessage(self, "DamageIndicator", BuildDamageIndicatorMessage(point, damage), true)
@@ -197,11 +201,16 @@ function Player:OnKill(damage, killer, doer, point, direction)
 
     local killerName = nil
     
-    if(killer and killer:isa("Player") and killer ~= self and killer:GetTeamNumber() == GetEnemyTeamNumber(self:GetTeamNumber())) then
+    local pointOwner = killer
+    // If the pointOwner is not a player, award it's points to it's owner.
+    if pointOwner ~= nil and not pointOwner:isa("Player") then
+        pointOwner = pointOwner:GetOwner()
+    end
+    if(pointOwner and pointOwner:isa("Player") and pointOwner ~= self and pointOwner:GetTeamNumber() == GetEnemyTeamNumber(self:GetTeamNumber())) then
    
-        killerName = killer:GetName()
-        killer:AddKill()        
-        killer:AddScore(self:GetPointValue())
+        killerName = pointOwner:GetName()
+        pointOwner:AddKill()        
+        pointOwner:AddScore(self:GetPointValue())
         
     end        
 
@@ -260,22 +269,8 @@ function Player:SetPlasma(amount)
 	//TCBM: Max plasma is used instead of maxresources (which is for animations)
     self.plasma = math.max(math.min(amount, kMaxPlasma), 0)
     
-end
 
-/**
- * Ends the use of the structure the player is currently using.
- */
-function Player:StopUsingStructure()
-
-    if (self.usingStructure ~= nil) then
-
-        self.usingStructure = nil
-        self.timeOfLastUse  = nil
-
-        self:Draw()
     
-    end
-
 end
 
 function Player:GetDeathMapName()
@@ -292,32 +287,7 @@ function Player:OnUpdate(deltaTime)
     
     self:UpdateOrderWaypoint()
 
-    if (self.usingStructure) then
-
-        // This is currently disabled since we will automatically stop using
-        // a structure when we get far enough away that we stop generating
-        // the use event.
-        /*
-        // Check if we've moved too far from the structure we're using to
-        // continue using it.
-        
-        local startPos   = self.usingStructurePosition
-        local currentPos = self:GetOrigin()
-        local distance   = Shared.DistanceBetweenPoints(startPos, currentPos)
-
-        local stopUsing = (distance > Player.kLoginBreakingDistance)
-        */
-
-        // Check if we haven't used the structure this tick. If so, we should
-        // processs the stop using notification.
-        
-        local time = Shared.GetTime()
-
-        if (time ~= self.timeOfLastUse) then
-            self:StopUsingStructure()
-        end
-
-    elseif (not self.alive and not self:isa("Spectator")) then
+    if (not self.alive and not self:isa("Spectator")) then
     
         local time = Shared.GetTime()
         
@@ -331,12 +301,14 @@ function Player:OnUpdate(deltaTime)
             
         end
 
-    // Pull out weapon again if we haven't built for a bit
-    elseif(self:GetWeaponHolstered() and (self.timeOfLastUse ~= nil) and (Shared.GetTime() - self.timeOfLastUse > .3)) then
-    
-        self:Draw()
-        
-    end    
+    else
+        self:UpdateUse(deltaTime)
+    end 
+
+    /*local viewModel = self:GetViewModelEntity()
+    if viewModel ~= nil then
+        viewModel:SetIsVisible(not self:GetWeaponHolstered())
+    end*/
 
     local gamerules = GetGamerules()
     self.gameStarted = gamerules:GetGameStarted()
@@ -479,7 +451,8 @@ function Player:Replace(mapName, newTeamNumber, preserveChildren)
     local owner  = Server.GetOwner(self)
     
     // Add new player to new team if specified
-    if(newTeamNumber ~= nil) then
+    // Both nil and -1 are possible invalid team numbers.
+    if(newTeamNumber ~= nil and newTeamNumber ~= -1) then
         teamNumber = newTeamNumber
     end
 
@@ -545,7 +518,7 @@ function Player:ProcessBuyAction(techId)
                 // buy it
                 if self:AttemptToBuy(techId) then
                 
-                    self:DeductPlasma(cost)
+                    self:AddPlasma(-cost)
                     
                     return true
                 
@@ -664,16 +637,6 @@ end
 
 function Player:GetViewModelBlendTime()
     return .1
-end
-
-function Player:DeductPlasma(cost)
-
-    if(Shared.GetDevMode()) then
-        cost = 1
-    end
-    
-    self:AddPlasma(-cost)
-    
 end
 
 function Player:GetScore()

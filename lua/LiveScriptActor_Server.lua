@@ -92,6 +92,8 @@ function LiveScriptActor:TakeDamage(damage, attacker, doer, point, direction)
                 
                 self:OnKill(damage, attacker, doer, point, direction)
                 
+                self:TriggerEffects("death")
+                
                 killed = true
                 
             end
@@ -105,7 +107,7 @@ function LiveScriptActor:TakeDamage(damage, attacker, doer, point, direction)
 end
 
 // Return the amount of health we added 
-function LiveScriptActor:AddHealth(health)
+function LiveScriptActor:AddHealth(health, playSound)
 
     local total = 0
     
@@ -121,6 +123,10 @@ function LiveScriptActor:AddHealth(health)
         end
         
         total = healthAdded + healthToAddToArmor
+        
+        if total > 0 and playSound and (self:GetTeamType() == kAlienTeamType) then
+            self:PlaySound(LiveScriptActor.kAlienRegenerationSound)
+        end
         
     end
     
@@ -139,26 +145,14 @@ function LiveScriptActor:GetDamageImpulse(damage, doer, point)
     return nil
 end
 
-// Play audio/visual effects when taking damage
 function LiveScriptActor:OnTakeDamage(damage, doer, point)
 
-    // Queue flinch animation because we apply damage during OnProcessMove()
-    // and animations are reverted after. Set animation during OnUpdate() instead.
-    local flinchAnim = self:GetFlinchAnimation(damage)
-    if doer and (doer:GetDamageType() == kDamageType.Flame) then
-        flinchAnim = self:GetFlinchFlamesAnimation(damage)
+    // Play audio/visual effects when taking damage   
+    local damageType = nil
+    if doer then
+        damageType = doer:GetDamageType()
     end
-    self.serverQueuedFlinchAnim = flinchAnim
-    
-    local flinchSound = self:GetFlinchSound(damage)
-    if flinchSound then
-        self:PlaySound(flinchSound)
-    end
-    
-    local flinchEffect = self:GetFlinchEffect(damage)
-    if flinchEffect and point ~= nil then
-        Shared.CreateEffect(nil, flinchEffect, nil, Coords.GetTranslation(point))
-    end
+    self:TriggerEffects("flinch", {damagetype = damageType, flinch_severe = ConditionalValue(damage > 20, true, false)})
     
     // Apply directed impulse to physically simulated objects, according to amount of damage
     if (self.physicsModel ~= nil and self.physicsType == Actor.PhysicsType.Dynamic) then    
@@ -185,26 +179,6 @@ function LiveScriptActor:OnTakeDamage(damage, doer, point)
     
 end
 
-function LiveScriptActor:ApplyQueuedFlinchAnimation()
-
-    if self.serverQueuedFlinchAnim then
-    
-        if self.serverQueuedFlinchAnim and self.serverQueuedFlinchAnim ~= "" then
-        
-            if self:GetFlinchOverlay(self.serverQueuedFlinchAnim) then
-                self:SetOverlayAnimation(self.serverQueuedFlinchAnim, true)
-            else
-                self:SetAnimationWithBlending(self.serverQueuedFlinchAnim, self:GetBlendTime(), true)
-            end
-            
-        end
-        
-        self.serverQueuedFlinchAnim = nil
-
-    end
-
-end
-
 function LiveScriptActor:GetTimeOfLastDamage()
     return self.timeOfLastDamage
 end
@@ -220,9 +194,14 @@ end
 function LiveScriptActor:OnKill(damage, attacker, doer, point, direction)
 
     // Give points to killer
-    if(attacker ~= nil and attacker:isa("Player") and attacker:GetTeamNumber() ~= self:GetTeamNumber()) then
-        attacker:AddScore(self:GetPointValue())
-		//give plasma for kills
+    local pointOwner = attacker
+    // If the pointOwner is not a player, award it's points to it's owner.
+    if pointOwner ~= nil and not pointOwner:isa("Player") then
+        pointOwner = pointOwner:GetOwner()
+    end
+    if(pointOwner ~= nil and pointOwner:isa("Player") and pointOwner:GetTeamNumber() ~= self:GetTeamNumber()) then
+        pointOwner:AddScore(self:GetPointValue())
+		//TCBM: give plasma for kills
 		attacker:AddPlasma(self:GetPointValue()/5)
 		attacker:ProcessPlayerResourceHelp()
     end
@@ -348,14 +327,13 @@ function LiveScriptActor:ComputeDamage(damage, damageType)
         // Calculate damage absorbed by armor according to damage type
         local absorbPercentage = self:GetArmorAbsorbPercentage(damageType)
         
-		//TCBM: Fixed health points used bug        
-		// Each point of armor blocks a point of health but is only destroyed at half that rate (like NS1)
+        // Each point of armor blocks a point of health but is only destroyed at half that rate (like NS1)
         healthPointsBlocked = math.min(self.armor, absorbPercentage * damage )
-		armorPointsUsed = healthPointsBlocked / self:GetHealthPerArmor(damageType)
+        armorPointsUsed = healthPointsBlocked / self:GetHealthPerArmor(damageType)
         
         // Anything left over comes off of health
-        healthPointsUsed = damage - healthPointsBlocked
-        //Print("health: %d, armor: %d, damage: %d, healthPointsBlocked: %d, apu: %d, hpu: %d",self.health, self.armor, damage, healthPointsBlocked,armorPointsUsed,healthPointsUsed)
+        healthPointsUsed = damage - healthPointsBlocked   
+     
     end
     
     return damage, armorPointsUsed, healthPointsUsed
@@ -650,7 +628,7 @@ function LiveScriptActor:GetHealthPerArmor(damageType)
 
     local healthPerArmor = kHealthPointsPerArmor
     
-    if damageType == kDamageType.Light or damageType == kDamageType.Flame then
+    if damageType == kDamageType.Light then
         healthPerArmor = kHealthPointsPerArmorLight
     elseif damageType == kDamageType.Heavy then
         healthPerArmor = kHealthPointsPerArmorHeavy
@@ -874,8 +852,6 @@ function LiveScriptActor:SetOnFire(attacker, doer)
     
     self.fireAttackerId = attacker:GetId()
     self.fireDoerId = doer:GetId()
-    
-    Shared.CreateEffect(nil, GetOnFireCinematic(self), self, Coords.GetIdentity())
     
 end
 

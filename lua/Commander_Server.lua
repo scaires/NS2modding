@@ -130,7 +130,7 @@ function Commander:AttemptToBuild(techId, origin, pickVec, buildTech, builderEnt
     if legalBuildPosition then
     
         local newEnt = CreateEntityForCommander(techId, position, self)
-		
+        
         if newEnt ~= nil then
 			//TCBM: Sentry direction set to that of builder
             if techId == kTechId.Sentry then
@@ -141,6 +141,11 @@ function Commander:AttemptToBuild(techId, origin, pickVec, buildTech, builderEnt
             
             // Play private version for commander too 
             Shared.PlayPrivateSound(self, self:GetPlaceBuildingSound(), nil, 1.0, self:GetOrigin())
+            
+            local replicateEffect = self:GetBuildEffect(techId)
+            if replicateEffect then
+                Shared.CreateEffect(nil, replicateEffect, newEnt, nil)
+            end
             
             if newEnt.GetPlaceBuildingEffect then
                 Shared.CreateEffect(nil, newEnt:GetPlaceBuildingEffect(), newEnt)
@@ -161,7 +166,8 @@ function Commander:TriggerNotEnoughResourcesAlert()
 
     local team = self:GetTeam()
     local alertType = ConditionalValue(team:GetTeamType() == kMarineTeamType, kTechId.MarineAlertNotEnoughResources, kTechId.AlienAlertNotEnoughResources)
-    team:TriggerAlert(alertType, self)
+    local commandStructure = Shared.GetEntity(self.commandStationId)
+    team:TriggerAlert(alertType, commandStructure)
 
 end
 
@@ -174,7 +180,7 @@ function Commander:ProcessTechTreeActionForEntity(techNode, position, pickVec, e
 
     // First make sure tech is allowed for entity
     local techId = techNode:GetTechId()
-    local techButtons = entity:GetTechButtons(self.currentMenu)
+    local techButtons = self:GetCurrentTechButtons(self.currentMenu, entity)
     
     if(techButtons == nil or table.find(techButtons, techId) == nil) then
         return success, keepProcessing
@@ -209,7 +215,7 @@ function Commander:ProcessTechTreeActionForEntity(techNode, position, pickVec, e
                                 
             elseif(techNode:GetIsBuild()) then
             
-                success = self:AttemptToBuild(techId, position, pickVec, true)
+                success = self:AttemptToBuild(techId, position, pickVec, false)
                 if success then 
                     keepProcessing = false
                 end
@@ -246,17 +252,13 @@ function Commander:ProcessTechTreeActionForEntity(techNode, position, pickVec, e
                 
             elseif(techNode:GetIsBuy()) then
             
-                if not techNode:GetRequiresTarget() then
-                    position = Vector(entity:GetOrigin())
-                end
-                
                 success = self:AttemptToBuild(techId, position, pickVec, false)
                 
             end
             
             if(success and cost ~= nil) then
             
-                self:DeductPlasma(cost)
+                self:AddPlasma(-cost)
                 Shared.PlayPrivateSound(self, Commander.kSpendPlasmaSoundName, nil, 1.0, self:GetOrigin())
                 
             end
@@ -436,6 +438,12 @@ function Commander:ProcessTechTreeAction(techId, pickVec, orientation, worldCoor
                     
             end
             
+            // On successful action, allow selection to receive orders
+            //if success then
+            //    for index, selectedEntity in ipairs(self.selectedSubGroupEntities) do
+            //    end
+            //end
+            
         end
         
     end
@@ -465,6 +473,10 @@ function Commander:GetIsEntityHotgrouped(entity)
     
     return false
     
+end
+
+function Commander:GiveOrderToSelection(orderType, targetId)
+
 end
 
 // Creates hotkey for number out of current selection. Returns true on success.
@@ -537,6 +549,8 @@ end
 // Send alert to player unless we recently sent the exact same alert. Returns true if it was sent.
 function Commander:SendAlert(techId, entity)
 
+    ASSERT(entity ~= nil)
+    
     local entityId = entity:GetId()
     local time = Shared.GetTime()
     
@@ -551,7 +565,7 @@ function Commander:SendAlert(techId, entity)
     end
     
     local location = Vector(entity:GetOrigin())
-    Server.SendCommand(self, string.format("minimapalert %d %.2f %.2f %d", techId, location.x, location.z, entity:GetId())) 
+    Server.SendCommand(self, string.format("minimapalert %d %.2f %.2f %d %d", techId, location.x, location.z, entity:GetId(), entity:GetTechId())) 
 
     // Insert new triple: techid/entityid/timesent
     table.insert(self.sentAlerts, {techId, entityId, time})
@@ -696,7 +710,12 @@ end
 
 function Commander:Logout()
 
-    self.commandStructure:Logout()
+    local commandStructure = Shared.GetEntity(self.commandStationId)
+    commandStructure:Logout()
         
+end
+
+function Commander:SetCommandStructure(commandStructure)
+    self.commandStationId = commandStructure:GetId()
 end
 

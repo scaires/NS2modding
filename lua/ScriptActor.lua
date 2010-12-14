@@ -33,7 +33,7 @@ local networkVars =
     teamType                    = string.format("integer (0 to %d)", kRandomTeamType),
     
     // Never set this directly, call SetTeamNumber()
-    teamNumber                  = string.format("integer (0 to %d)", kSpectatorIndex),
+    teamNumber                  = string.format("integer (-1 to %d)", kSpectatorIndex),
     
     // Whether this entity is in sight of the enemy team
     sighted                     = "boolean",
@@ -64,6 +64,8 @@ function ScriptActor:OnCreate()
     self.teamType = kNeutralTeamType
     
     self.sighted = false
+    
+    self.teamNumber = -1
 
     self.techId = LookupTechId(self:GetMapName(), kTechDataMapName, kTechId.None)
     
@@ -103,7 +105,7 @@ function ScriptActor:OnLoad()
     local teamNumber = GetAndCheckValue(self.teamNumber, 0, 2, "teamNumber", 0)
     
     // Set to nil to prevent OnTeamChange() from being called before it's set for the first time
-    self.teamNumber = nil
+    self.teamNumber = -1
     
     self:SetTeamNumber(teamNumber)
     
@@ -190,7 +192,8 @@ end
 // Return tech ids that represent research or actions for this entity in specified menu. Parameter is kTechId.RootMenu for
 // default menu or a entity-defined menu id for a sub-menu. Return nil if this actor doesn't recognize a menu of that type.
 // Used for drawing icons in selection menu and also for verifying which actions are valid for entities and when (ie, when
-// a MASC can siege, or when a unit has enough energy to perform an action, etc.)
+// a ARC can siege, or when a unit has enough energy to perform an action, etc.)
+// Return list of 8 tech ids, represnting the 2nd and 3rd row of the 4x3 build icons.
 function ScriptActor:GetTechButtons(techId)
     return nil
 end
@@ -304,14 +307,16 @@ function ScriptActor:GetAttachPointOrigin(attachPointName)
 
     local attachPointIndex = self:GetAttachPointIndex(attachPointName)
     local coords = Coords.GetIdentity()
+    local success = false
     
     if (attachPointIndex ~= -1) then
         coords = self:GetAttachPointCoords(attachPointIndex)
+        success = true
     else
         Print("ScriptActor:GetAttachPointOrigin(%s, %s): Attach point not found.", self:GetMapName(), attachPointName)
     end
     
-    return coords.origin
+    return coords.origin, success
     
 end
 
@@ -367,6 +372,27 @@ function ScriptActor:GetLocationName()
     
     return locationName
     
+end
+
+// Hooks into effect manager
+function ScriptActor:TriggerEffects(effectName, tableParams)
+
+    if effectName and effectName ~= "" then
+    
+        if not tableParams then
+            tableParams = {}
+        end
+        
+        tableParams[kEffectFilterClassName] = self:GetClassName()
+        tableParams[kEffectHostCoords] = self:GetCoords()
+        tableParams[kEffectFilterIsAlien] = (self.teamType == kAlienTeamType)
+        
+        GetEffectManager():TriggerEffects(effectName, tableParams, self)
+        
+    else
+        Print("%s:TriggerEffects(): Called with invalid effectName)", self:GetClassName(), ToString(effectName))
+    end
+        
 end
 
 Shared.LinkClassToMap("ScriptActor", ScriptActor.kMapName, networkVars )

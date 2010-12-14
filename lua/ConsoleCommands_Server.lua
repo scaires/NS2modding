@@ -156,6 +156,34 @@ function OnCommandRoundReset(client)
     end
 end
 
+function OnCommandAnimDebug(client, className)
+
+    if Shared.GetDevMode() then
+    
+        local player = client:GetControllingPlayer()
+        
+        if className then
+        
+            gActorAnimDebugClass = className
+            Server.SendCommand(player, string.format("onanimdebug %s", className))
+            Print("anim_debug enabled for \"%s\" objects.", className)
+            
+        elseif gActorAnimDebugClass ~= "" then
+        
+            gActorAnimDebugClass = ""
+            Server.SendCommand(player, "onanimdebug")
+            Print("anim_debug disabled.")
+            
+        else
+            Print("anim_debug <class name>")
+        end
+
+    else
+        Print("anim_debug <class name> (dev mode must be enabled)")
+    end
+    
+end
+
 // Generic console commands
 Event.Hook("Console_name",                  OnCommandSetName)
 Event.Hook("Console_say",                   OnCommandSay)
@@ -165,4 +193,4 @@ Event.Hook("Console_darwinmode",            OnCommandDarwinMode)
 Event.Hook("Console_thirdperson",           OnCommandThirdperson)
 Event.Hook("Console_reset",                 OnCommandRoundReset)
 Event.Hook("Console_updateping",            OnCommandUpdatePing)
-
+Event.Hook("Console_anim_debug",            OnCommandAnimDebug)

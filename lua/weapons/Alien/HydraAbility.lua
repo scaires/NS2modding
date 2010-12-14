@@ -13,7 +13,7 @@ HydraAbility.kMapName = "chamber"
 
 HydraAbility.kCreateStartSound = PrecacheAsset("sound/ns2.fev/alien/gorge/create_structure_start")
 
-HydraAbility.kCircleModelName = PrecacheAsset("models/misc/circle/circle.model")
+HydraAbility.kCircleModelName = PrecacheAsset("models/misc/circle/circle_alien.model")
 
 HydraAbility.kCreateEffect = PrecacheAsset("cinematics/alien/gorge/create.cinematic")
 HydraAbility.kCreateViewEffect = PrecacheAsset("cinematics/alien/gorge/create_view.cinematic")
@@ -23,6 +23,9 @@ HydraAbility.kAnimHydraAttack = "chamber_attack"
 HydraAbility.kAnimIdleTable = { {1, "idle"}/*, {.3, "idle2"}, {.05, "idle3"}*/ }
 
 HydraAbility.kPlacementDistance = 1.1
+
+HydraAbility.kHydraAbilityEnergyCost = kHydraAbilityEnergyCost
+
 
 local networkVars = 
 {
@@ -121,7 +124,7 @@ function HydraAbility:CreateHydra(player)
     if Server then
     
         local coords, valid = self:GetPositionForHydra(player)
-
+    
         local cost = LookupTechData(kTechId.Hydra, kTechDataCostKey)
         if valid and (player:GetPlasma() >= cost) then
         
@@ -139,7 +142,8 @@ function HydraAbility:CreateHydra(player)
                 player:PlaySound(player:GetPlaceBuildingSound())
                 
                 player:AddPlasma( -cost )
-                
+                player:AddEnergy(-HydraAbility.kHydraAbilityEnergyCost)
+				
             else
             
                 DestroyEntity(hydra)

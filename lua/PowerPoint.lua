@@ -54,7 +54,7 @@ PowerPoint.kLowPowerMinIntensity = .4
 PowerPoint.kDamagedCycleTime = .8
 PowerPoint.kDamagedMinIntensity = .7
 PowerPoint.kAuxPowerCycleTime = 2
-PowerPoint.kAuxPowerMinIntensity = .2
+PowerPoint.kAuxPowerMinIntensity = .25
 
 local networkVars =
 {
@@ -98,10 +98,6 @@ function PowerPoint:OnReset()
     
     Structure.OnReset(self)
     
-end
-
-function PowerPoint:GetTechId()
-    return kTechId.PowerPoint
 end
 
 function PowerPoint:GetCanTakeDamage()

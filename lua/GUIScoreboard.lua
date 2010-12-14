@@ -23,8 +23,9 @@ GUIScoreboard.kInsanePingColor = Color(1, 0, 0, 1)
 
 // Team constants.
 GUIScoreboard.kTeamNameFontSize = 26
+GUIScoreboard.kTeamInfoFontSize = 16
 GUIScoreboard.kTeamItemWidth = 500
-GUIScoreboard.kTeamItemHeight = 32
+GUIScoreboard.kTeamItemHeight = GUIScoreboard.kTeamNameFontSize + GUIScoreboard.kTeamInfoFontSize + 8
 GUIScoreboard.kTeamSpacing = 32
 GUIScoreboard.kTeamScoreColumnStartX = 250
 GUIScoreboard.kTeamColumnSpacingX = 50
@@ -33,7 +34,7 @@ GUIScoreboard.kTeamColumnSpacingX = 50
 GUIScoreboard.kPlayerStatsFontSize = 16
 GUIScoreboard.kPlayerItemWidthBuffer = 10
 GUIScoreboard.kPlayerItemHeight = 32
-GUIScoreboard.kPlayerSpacing = 8
+GUIScoreboard.kPlayerSpacing = 4
 
 // Color constants.
 GUIScoreboard.kBlueColor = ColorIntToColor(kMarineTeamColor)
@@ -52,16 +53,16 @@ function GUIScoreboard:Initialize()
     // Blue team.
     table.insert(self.teams, { GUIs = self:CreateTeamBackground(GUIScoreboard.kBlueColor), TeamName = ScoreboardUI_GetBlueTeamName(),
                                Color = GUIScoreboard.kBlueColor, PlayerList = { }, HighlightColor = GUIScoreboard.kBlueHighlightColor,
-                               GetScores = ScoreboardUI_GetBlueScores })
+                               GetScores = ScoreboardUI_GetBlueScores, TeamNumber = kTeam1Index})
     // Red team.
     table.insert(self.teams, { GUIs = self:CreateTeamBackground(GUIScoreboard.kRedColor), TeamName = ScoreboardUI_GetRedTeamName(),
                                Color = GUIScoreboard.kRedColor, PlayerList = { }, HighlightColor = GUIScoreboard.kRedHighlightColor,
-                               GetScores = ScoreboardUI_GetRedScores })
+                               GetScores = ScoreboardUI_GetRedScores, TeamNumber = kTeam2Index })
     
     // Spectator team.
     table.insert(self.teams, { GUIs = self:CreateTeamBackground(GUIScoreboard.kSpectatorColor), TeamName = ScoreboardUI_GetSpectatorTeamName(),
                                Color = GUIScoreboard.kSpectatorColor, PlayerList = { }, HighlightColor = GUIScoreboard.kSpectatorHighlightColor,
-                               GetScores = ScoreboardUI_GetSpectatorScores })
+                               GetScores = ScoreboardUI_GetSpectatorScores, TeamNumber = kTeamReadyRoom })
 
     self.playerHighlightItem = GUI.CreateGraphicsItem()
     self.playerHighlightItem:SetSize(Vector(GUIScoreboard.kTeamItemWidth - (GUIScoreboard.kPlayerItemWidthBuffer * 2), GUIScoreboard.kPlayerItemHeight, 0))
@@ -108,6 +109,17 @@ function GUIScoreboard:CreateTeamBackground(color)
     teamNameItem:SetColor(color)
     teamItem:AddChild(teamNameItem)
     
+    // Add team info (carbon and number of players)
+    local teamInfoItem = GUI.CreateTextItem()
+    teamInfoItem:SetFontName(GUIScoreboard.kFontName)
+    teamInfoItem:SetFontSize(GUIScoreboard.kTeamInfoFontSize)
+    teamInfoItem:SetAnchor(GUIItem.Left, GUIItem.Top)
+    teamInfoItem:SetTextAlignmentX(GUITextItem.Align_Min)
+    teamInfoItem:SetTextAlignmentY(GUITextItem.Align_Min)
+    teamInfoItem:SetPosition(Vector(15, GUIScoreboard.kTeamNameFontSize, 0))
+    teamInfoItem:SetColor(color)
+    teamItem:AddChild(teamInfoItem)
+    
     local currentColumnX = GUIScoreboard.kTeamScoreColumnStartX
     
     // Score text item.
@@ -152,6 +164,20 @@ function GUIScoreboard:CreateTeamBackground(color)
     
     currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
     
+    // Resources text item.
+    local resItem = GUI.CreateTextItem()
+    resItem:SetFontName(GUIScoreboard.kFontName)
+    resItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    resItem:SetAnchor(GUIItem.Left, GUIItem.Top)
+    resItem:SetTextAlignmentX(GUITextItem.Align_Min)
+    resItem:SetTextAlignmentY(GUITextItem.Align_Min)
+    resItem:SetPosition(Vector(currentColumnX, 5, 0))
+    resItem:SetColor(color)
+    resItem:SetText("Plasma")
+    teamItem:AddChild(resItem)
+    
+    currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
+    
     // Ping text item.
     local pingItem = GUI.CreateTextItem()
     pingItem:SetFontName(GUIScoreboard.kFontName)
@@ -164,7 +190,7 @@ function GUIScoreboard:CreateTeamBackground(color)
     pingItem:SetText("Ping")
     teamItem:AddChild(pingItem)
     
-    return { Background = teamItem, TeamName = teamNameItem }
+    return { Background = teamItem, TeamName = teamNameItem, TeamInfo = teamInfoItem }
     
 end
 
@@ -194,7 +220,7 @@ function GUIScoreboard:Update(deltaTime)
             local sizeOfAllTeams = 0
             for index, team in ipairs(self.teams) do
                 if team["GUIs"]["Background"]:GetIsVisible() then
-                    sizeOfAllTeams = sizeOfAllTeams + team["GUIs"]["Background"]:GetSize().y + GUIScoreboard.kTeamSpacing
+                    sizeOfAllTeams = sizeOfAllTeams + team["GUIs"]["Background"]:GetSize().y + GUIScoreboard.kTeamSpacing 
                 end
             end
             
@@ -216,18 +242,29 @@ function GUIScoreboard:UpdateTeam(updateTeam)
     
     local teamGUIItem = updateTeam["GUIs"]["Background"]
     local teamNameGUIItem = updateTeam["GUIs"]["TeamName"]
+    local teamInfoGUIItem = updateTeam["GUIs"]["TeamInfo"]
     local teamNameText = updateTeam["TeamName"]
     local teamColor = updateTeam["Color"]
     local localPlayerHighlightColor = updateTeam["HighlightColor"]
     local playerList = updateTeam["PlayerList"]
     local teamScores = updateTeam["GetScores"]()
+    
+    local isLocalTeam = false
+    local player = Client.GetLocalPlayer()
+    if player and player:GetTeamNumber() == updateTeam["TeamNumber"] then
+        isLocalTeam = true
+    end
 
     // How many items per player.
-    local numElementsPerPlayerRecord = 6
+    local numElementsPerPlayerRecord = 7
     local numPlayers = table.count(teamScores) / numElementsPerPlayerRecord
     
     // Update the team name text.
-    teamNameGUIItem:SetText(teamNameText .. " [" .. Pluralize(numPlayers, "Player") .. "]")
+    teamNameGUIItem:SetText(string.format("%s (%s)", teamNameText, Pluralize(numPlayers, "Player")))
+    
+    // Update carbon display
+    local carbonString = ConditionalValue(isLocalTeam, string.format("%d Carbon", player:GetTeamCarbon()), "")
+    teamInfoGUIItem:SetText(string.format("%s", carbonString))
     
     // Make sure there is enough room for all players on this team GUI.
     teamGUIItem:SetSize(Vector(GUIScoreboard.kTeamItemWidth, (GUIScoreboard.kTeamItemHeight) + ((GUIScoreboard.kPlayerItemHeight + GUIScoreboard.kPlayerSpacing) * numPlayers), 0))
@@ -237,7 +274,7 @@ function GUIScoreboard:UpdateTeam(updateTeam)
         self:ResizePlayerList(playerList, numPlayers, teamGUIItem)
     end
     
-    local currentY = GUIScoreboard.kTeamItemHeight
+    local currentY = GUIScoreboard.kTeamNameFontSize + GUIScoreboard.kTeamInfoFontSize
     local currentPlayerIndex = 1
     for index, player in pairs(playerList) do
         // GetScores table format: Name, score, kills, deaths, ping.
@@ -246,7 +283,8 @@ function GUIScoreboard:UpdateTeam(updateTeam)
         local kills = tostring(teamScores[currentPlayerIndex + 2])
         local deaths = tostring(teamScores[currentPlayerIndex + 3])
         local isCommander = teamScores[currentPlayerIndex + 4]
-        local ping = teamScores[currentPlayerIndex + 5]
+        local plasmaStr = ConditionalValue(isLocalTeam, tostring(teamScores[currentPlayerIndex + 5]), "-")
+        local ping = teamScores[currentPlayerIndex + 6]
         local pingStr = tostring(ping)
         local currentPosition = Vector(player["Background"]:GetPosition())
         currentPosition.y = currentY
@@ -273,6 +311,7 @@ function GUIScoreboard:UpdateTeam(updateTeam)
         player["Score"]:SetText(score)
         player["Kills"]:SetText(kills)
         player["Deaths"]:SetText(deaths)
+        player["Plasma"]:SetText(plasmaStr)
         player["Ping"]:SetText(pingStr)
         if ping < GUIScoreboard.kLowPingThreshold then
             player["Ping"]:SetColor(GUIScoreboard.kLowPingColor)
@@ -377,6 +416,19 @@ function GUIScoreboard:CreatePlayerItem()
     
     currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
     
+    // Resources text item.
+    local resItem = GUI.CreateTextItem()
+    resItem:SetFontName(GUIScoreboard.kFontName)
+    resItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    resItem:SetAnchor(GUIItem.Left, GUIItem.Top)
+    resItem:SetTextAlignmentX(GUITextItem.Align_Min)
+    resItem:SetTextAlignmentY(GUITextItem.Align_Min)
+    resItem:SetPosition(Vector(currentColumnX, 5, 0))
+    resItem:SetColor(Color(1, 1, 1, 1))
+    playerItem:AddChild(resItem)
+    
+    currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
+    
     // Ping text item.
     local pingItem = GUI.CreateTextItem()
     pingItem:SetFontName(GUIScoreboard.kFontName)
@@ -388,6 +440,6 @@ function GUIScoreboard:CreatePlayerItem()
     pingItem:SetColor(Color(1, 1, 1, 1))
     playerItem:AddChild(pingItem)
     
-    return { Background = playerItem, Name = playerNameItem, Score = scoreItem, Kills = killsItem, Deaths = deathsItem, Ping = pingItem }
+    return { Background = playerItem, Name = playerNameItem, Score = scoreItem, Kills = killsItem, Deaths = deathsItem, Plasma = resItem, Ping = pingItem }
     
 end
