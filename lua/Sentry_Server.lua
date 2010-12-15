@@ -281,7 +281,7 @@ function Sentry:GetSortedTargetList()
             table.insertunique(targets, currentTarget)
         end
         
-    end    
+    end    	
     
     function sortSentryTargets(ent1, ent2)
     
@@ -495,7 +495,7 @@ function Sentry:UpdateAttack(deltaTime)
 		else
         
             // Get new attack order if any enemies nearby
-            self:AcquireTarget(deltaTime)
+            self:TCBMAcquireTarget(deltaTime)
             
             // Maybe fire another bullet at target
             self:UpdateAttackTarget(deltaTime)
@@ -559,13 +559,23 @@ function Sentry:FireBullets()
                 end
                                    
                 if Server then
-                if trace.entity and trace.entity.TakeDamage then
-                
-                    local direction = (trace.endPoint - startPoint):GetUnit()
-                    
-                    trace.entity:TakeDamage(Sentry.kDamagePerBullet, self, self, endPoint, direction)
-                    
-                end
+					if trace.entity and trace.entity.TakeDamage then
+					
+						local direction = (trace.endPoint - startPoint):GetUnit()
+						
+						trace.entity:TakeDamage(Sentry.kDamagePerBullet, self, self, endPoint, direction)
+						// When bullets hit targets, apply force to send them backwards
+						//from minigun code
+						if(trace.entity:isa("Player")) then
+						
+							// Take player mass into account
+							local impulseVelocity = GetNormalizedVector(direction) * ((200) / trace.entity:GetMass())
+							//Print("targetvel x %f y %f z %f impulse x %f y %f z %f",trace.entity:GetVelocity().x,trace.entity:GetVelocity().y,trace.entity:GetVelocity().z,impulseVelocity.x,impulseVelocity.y,impulseVelocity.z)
+							local targetVelocity = trace.entity:GetVelocity() + impulseVelocity
+							
+							trace.entity:SetVelocity(targetVelocity)
+						end          
+					end
                 end
                 
             end
