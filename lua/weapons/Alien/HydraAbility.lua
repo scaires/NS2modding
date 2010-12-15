@@ -106,11 +106,11 @@ function HydraAbility:PerformPrimaryAttack(player)
                 
             else
                 Shared.PlayPrivateSound(player, player:GetNotEnoughResourcesSound(), player, 1.0, Vector(0, 0, 0))
-				player:AddEnergy(HydraAbility.kHydraAbilityEnergyCost)
+				
             end
             
         else
-        
+			player:AddEnergy(HydraAbility.kHydraAbilityEnergyCost)
             Shared.PlayPrivateSound(player, Player.kInvalidSound, player, 1.0, Vector(0, 0, 0))
         
         end    

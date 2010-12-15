@@ -569,7 +569,7 @@ function Sentry:FireBullets()
 						if(trace.entity:isa("Player")) then
 						
 							// Take player mass into account
-							local impulseVelocity = GetNormalizedVector(direction) * ((200) / trace.entity:GetMass())
+							local impulseVelocity = GetNormalizedVector(direction) * ((50) / trace.entity:GetMass())
 							//Print("targetvel x %f y %f z %f impulse x %f y %f z %f",trace.entity:GetVelocity().x,trace.entity:GetVelocity().y,trace.entity:GetVelocity().z,impulseVelocity.x,impulseVelocity.y,impulseVelocity.z)
 							local targetVelocity = trace.entity:GetVelocity() + impulseVelocity
 							

@@ -83,6 +83,10 @@ function Flamethrower:GetClipSize()
     return kFlamethrowerClipSize
 end
 
+function Flamethrower:GetMaxAmmo()
+    return kFlamethrowerNumClips * self:GetClipSize()
+end
+
 function Flamethrower:CreatePrimaryAttackEffect(player)
 
     // Create 1st person or world flame effect

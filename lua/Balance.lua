@@ -198,10 +198,12 @@ kShotgunMinDamageRange = 20
 kShotgunMaxDamageRange = 2	
 kShotgunSpreadDegrees = 20	
 	
-kFlamethrowerDamage = 12.5	
+kFlamethrowerDamage = 5	
 kFlamethrowerDamageType = kDamageType.Flame	
-kFlamethrowerFireDelay = 0.25	
-kFlamethrowerClipSize = 20	
+kFlamethrowerFireDelay = 0.10	
+kFlamethrowerClipSize = 85
+kFlamethrowerNumClips = 3
+	
 	
 kBurnDamagePerSecond = 10	
 	
@@ -218,7 +220,7 @@ kMACAttackFireDelay = 0.6
 kSentryAttackDamage = 10	
 kSentryAttackDamageType = kDamageType.Light	
 kSentryAttackBaseROF = 0.02	
-kSentryAttackRandROF = 0.00075	
+kSentryAttackRandROF = 0.005	
 kSentryAttackBulletsPerSalvo = 1	
 	
 kARCDamage = 300	
